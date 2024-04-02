@@ -1,0 +1,17 @@
+[
+  {
+    "id": 1,
+    "text": "Home",
+    "link": "/home"
+  },
+  {
+    "id": 2,
+    "text": "Gaming",
+    "link": "/gaming"
+  },
+  {
+    "id": 3,
+    "text": "More",
+    "link": "/more"
+  }
+]

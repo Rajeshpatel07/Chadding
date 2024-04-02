@@ -1,0 +1,14 @@
+[
+  {
+    "id": 1,
+    "text": "LOGIN",
+    "bg": "",
+    "color": "white"
+  },
+  {
+    "id": 2,
+    "text": "SIGNUP",
+    "bg": "white",
+    "color": "black"
+  }
+]
