@@ -1,9 +1,7 @@
 import { Response, Request } from "express";
-import { PrismaClient } from "@prisma/client";
-import { hash, compare } from "bcrypt";
 import { User } from "../Interfaces/DBInterfaces.js";
-
-const prisma = new PrismaClient;
+import { HashPassword, PasswordCompare, generateToken } from "../services/Auth.js";
+import { CreateUser, findSingleUser } from "../services/User.js"
 
 const Home = (req: Request, res: Response) => {
   res.json({ msg: "This is home Route" });
@@ -17,14 +15,8 @@ const signup = async (req: Request, res: Response) => {
   }
 
   try {
-    const hashPassword: string = await hash(Password, 10)
-    const newUser: User = await prisma.users.create({
-      data: {
-        Email,
-        Password: hashPassword,
-        updatedAt: new Date()
-      }
-    });
+    const userpassword: string = await HashPassword(Password)
+    const newUser: User = await CreateUser(Email, userpassword);
     res.json(newUser);
   } catch (error) {
     console.log(error);
@@ -40,17 +32,13 @@ const login = async (req: Request, res: Response) => {
   }
 
   try {
-    const user = await prisma.users.findFirst({
-      where: { Email },
-    }) as User;
-    if (user?.Password) {
-      const comparePassword = await compare(Password, user?.Password);
-      if (comparePassword) {
-        return res.json({ msg: "Welcome Sir" });
-      }
-      return res.json({ msg: "Incorrect Password" });
+    const user = await findSingleUser(Email);
+    if (await PasswordCompare(Password, user)) {
+      const Token = await generateToken(user);
+      res.cookie("Token", Token, { httpOnly: true });
+      res.json({ msg: "Welcome Sir" })
     } else {
-      return res.json({ msg: "No User found with this Email" });
+      return res.json({ msg: "Incorrect Password" })
     }
   } catch (error) {
     console.log(error);
