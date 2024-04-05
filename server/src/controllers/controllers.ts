@@ -46,9 +46,14 @@ const login = async (req: Request, res: Response) => {
   }
 }
 
+const Profile = (req: Request, res: Response) => {
+  res.send("Welcome");
+}
+
 
 export {
   Home,
   signup,
   login,
+  Profile,
 }

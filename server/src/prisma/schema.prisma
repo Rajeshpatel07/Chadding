@@ -7,10 +7,30 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Users {
+model User {
   Id        String   @id @default(uuid())
+  Username  String   @unique
   Email     String   @unique
   Password  String
+  Role      String   @default("user")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  videos    Video[]
+}
+
+model Video {
+  Id        String    @id @default(uuid())
+  Title     String
+  Creator   User      @relation(fields: [CreatorBy], references: [Id])
+  CreatorBy String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  Comments  Comment[]
+}
+
+model Comment {
+  Id        String @id @default(uuid())
+  comment   String
+  Creator   Video  @relation(fields: [CreatedBy], references: [Id])
+  CreatedBy String
 }
