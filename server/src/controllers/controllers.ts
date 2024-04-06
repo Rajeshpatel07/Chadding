@@ -8,15 +8,15 @@ const Home = (req: Request, res: Response) => {
 };
 
 const signup = async (req: Request, res: Response) => {
-  const { Email, Password }: User = req.body;
-  if (!Email || !Password) {
+  const { Username, Email, Password }: User = req.body;
+  if (!Username || !Email || !Password) {
     res.json({ msg: "All fields are mandatory" })
     return;
   }
 
   try {
     const userpassword: string = await HashPassword(Password)
-    const newUser: User = await CreateUser(Email, userpassword);
+    const newUser: User = await CreateUser(Username, Email, userpassword);
     res.json(newUser);
   } catch (error) {
     console.log(error);

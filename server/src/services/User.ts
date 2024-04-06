@@ -4,9 +4,10 @@ import { User } from "../Interfaces/DBInterfaces.js";
 const prisma = new PrismaClient();
 
 
-export const CreateUser = async (Email: string, Password: string) => {
-  const newUser: User = await prisma.users.create({
+export const CreateUser = async (Username: string, Email: string, Password: string) => {
+  const newUser: User = await prisma.user.create({
     data: {
+      Username,
       Email,
       Password,
       updatedAt: new Date()
@@ -16,7 +17,7 @@ export const CreateUser = async (Email: string, Password: string) => {
 }
 
 export const findSingleUser = async (Email: string) => {
-  const user: User = await prisma.users.findFirst({
+  const user: User = await prisma.user.findFirst({
     where: { Email },
   }) as User;
   return user;

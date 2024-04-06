@@ -13,7 +13,7 @@ export default {
       width: {
         '128': '32rem',
         '130': '40rem',
-        '90': '95rem'
+        '90': '95rem',
       },
     },
   },
