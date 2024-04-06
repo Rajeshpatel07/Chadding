@@ -6,3 +6,11 @@ export interface User {
   createdAt?: Date;
   updatedAt?: Date;
 }
+
+export interface Video {
+  Id?: string;
+  Title?: string;
+  createdBy?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+}

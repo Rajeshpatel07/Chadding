@@ -1,11 +1,13 @@
 import { createServer } from "http";
 import express from "express";
 import router from "./routes/routes.js"
+import { PrismaClient } from "@prisma/client";
 import { Server } from "socket.io";
 
 const app = express();
-const server = createServer(app)
-export const io = new Server(server)
+const server = createServer(app);
+export const io = new Server(server);
+export const prisma = new PrismaClient();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));

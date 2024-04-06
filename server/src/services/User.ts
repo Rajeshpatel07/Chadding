@@ -1,7 +1,5 @@
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "../index.js";
 import { User } from "../Interfaces/DBInterfaces.js";
-
-const prisma = new PrismaClient();
 
 
 export const CreateUser = async (Username: string, Email: string, Password: string) => {
