@@ -14,9 +14,12 @@ model User {
   Email     String   @unique
   Password  String
   Role      String   @default("user")
+  ProfileImage String?
+  Discription String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   videos    Video[]
+  comments   Comment[] @relation(name: "UserComments")
 }
 
 model Video {
@@ -26,12 +29,13 @@ model Video {
   createdBy String
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  Comments  Comment[]
+  Comments  Comment[] @relation(name: "VideoComments")
 }
 
 model Comment {
   Id        String @id @default(uuid())
   comment   String
-  Creator   Video  @relation(fields: [CreatedBy], references: [Id])
+  video     Video  @relation(fields: [CreatedBy], references: [Id])
   CreatedBy String
+  creator   User    @relation(fields: [CreatedBy], references: [Id])
 }

@@ -20,3 +20,14 @@ export const findSingleUser = async (Email: string) => {
   }) as User;
   return user;
 }
+
+export const getSingleUser = async (username: string) => {
+  const user: User = await prisma.user.findUnique({
+    where: {
+      Username: username
+    }
+  }) as User;
+
+  return user;
+}
+

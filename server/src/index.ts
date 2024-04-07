@@ -10,7 +10,7 @@ export const io = new Server(server);
 export const prisma = new PrismaClient();
 
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+// app.use(express.urlencoded({ extended: false }));
 app.use('/api', router)
 
 

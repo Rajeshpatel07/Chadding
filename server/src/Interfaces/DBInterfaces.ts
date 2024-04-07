@@ -10,7 +10,9 @@ export interface User {
 export interface Video {
   Id?: string;
   Title?: string;
-  createdBy?: string;
+  Creator?:{
+    Id?:string;
+  };
   createdAt?: Date;
   updatedAt?: Date;
 }

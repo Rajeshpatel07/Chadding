@@ -1,59 +1,30 @@
-import { Response, Request } from "express";
-import { User } from "../Interfaces/DBInterfaces.js";
-import { HashPassword, PasswordCompare, generateToken } from "../services/Auth.js";
-import { CreateUser, findSingleUser } from "../services/User.js"
+import { Request, Response } from "express";
+import { getSingleUser } from "../services/User.js"
+import { UserVideos } from "../services/Video.js";
 
-const Home = (req: Request, res: Response) => {
-  res.json({ msg: "This is home Route" });
-};
-
-const signup = async (req: Request, res: Response) => {
-  const { Username, Email, Password }: User = req.body;
-  if (!Username || !Email || !Password) {
-    res.json({ msg: "All fields are mandatory" })
-    return;
-  }
+export const getUser = async (req: Request, res: Response) => {
+  const { username } = req.params;
+  if (!username) return res.json({ msg: "Invalid Username" })
 
   try {
-    const userpassword: string = await HashPassword(Password)
-    const newUser: User = await CreateUser(Username, Email, userpassword);
-    res.json(newUser);
+    const User = await getSingleUser(username);
+    res.json(User)
   } catch (error) {
     console.log(error);
-    res.json({ msg: "Failed to Signup" });
+    res.json(error)
   }
 }
 
-const login = async (req: Request, res: Response) => {
-  const { Email, Password }: User = req.body;
-  if (!Email || !Password) {
-    res.json({ msg: "All fields are mandatory" });
-    return;
-  }
+export const getUserVideos = async (req: Request, res: Response) => {
+  const { Id } = req.params;
+  if (!Id) return res.json({ msg: "Invalid Video Id" })
+  console.log(Id)
 
   try {
-    const user = await findSingleUser(Email);
-    if (await PasswordCompare(Password, user)) {
-      const Token = await generateToken(user);
-      res.cookie("Token", Token, { httpOnly: true });
-      res.json({ msg: "Welcome Sir" })
-    } else {
-      return res.json({ msg: "Incorrect Password" })
-    }
+    const Videos = await UserVideos(Id);
+    res.json(Videos)
   } catch (error) {
     console.log(error);
-    res.json({ msg: "Failed to login" });
+    res.json(error)
   }
-}
-
-const Profile = (req: Request, res: Response) => {
-  res.send("Welcome");
-}
-
-
-export {
-  Home,
-  signup,
-  login,
-  Profile,
 }

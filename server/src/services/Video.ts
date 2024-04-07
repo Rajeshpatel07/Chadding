@@ -1,14 +1,38 @@
 import { prisma } from "../index.js";
 import { Video } from "Interfaces/DBInterfaces";
 
-
-export const addVideo = async (Title: string, createdBy: string) => {
+// TODO
+export const addVideo = async (Title: string, creatorId: string) => {
   const newVideo: Video = await prisma.video.create({
     data: {
       Title,
-      createdBy,
-      updatedAt: new Date()
-    }
+      Creator: {
+        connect: {
+          Id: creatorId,
+        },
+      },
+      updatedAt: new Date(),
+    },
   });
   return newVideo;
+};
+
+export const getSingleVideo = async (Id: string) => {
+  const video = await prisma.video.findUnique({
+    where: {
+      Id
+    },
+  })
+  return video;
 }
+
+
+export const UserVideos = async (Id: string) => {
+  const videos = await prisma.video.findMany({
+    where: {
+      CreatorBy: Id
+    }
+  })
+  return videos;
+}
+
