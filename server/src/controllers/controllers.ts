@@ -13,10 +13,12 @@ const signup = async (req: Request, res: Response) => {
     res.json({ msg: "All fields are mandatory" })
     return;
   }
+  const ProfileImage:string="33234234-image.png";
+  console.log(Username, Email, Password,ProfileImage);
 
   try {
     const userpassword: string = await HashPassword(Password)
-    const newUser: User = await CreateUser(Username, Email, userpassword);
+    const newUser: User = await CreateUser(Username, Email, userpassword,ProfileImage);
     res.json(newUser);
   } catch (error) {
     console.log(error);

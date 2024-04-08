@@ -17,8 +17,7 @@ export const getUser = async (req: Request, res: Response) => {
 
 export const getUserVideos = async (req: Request, res: Response) => {
   const { Id } = req.params;
-  if (!Id) return res.json({ msg: "Invalid Video Id" })
-  console.log(Id)
+  if (!Id) return res.json({ msg: "Invalid User Id" })
 
   try {
     const Videos = await UserVideos(Id);

@@ -30,7 +30,7 @@ export const getSingleVideo = async (Id: string) => {
 export const UserVideos = async (Id: string) => {
   const videos = await prisma.video.findMany({
     where: {
-      CreatorBy: Id
+      CreatedBy:Id
     }
   })
   return videos;
