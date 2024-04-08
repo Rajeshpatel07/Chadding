@@ -1,9 +1,8 @@
 import React from 'react'
 import { motion } from 'framer-motion'
-import { Link } from 'react-router-dom'
+import { Link, Outlet } from 'react-router-dom'
 import NavItems from '../../Data/NavItems.json'
 import Login from '../../Data/Login.json'
-import Home from '../Home/Home'
 
 const Header: React.FC = () => {
 
@@ -30,7 +29,7 @@ const Header: React.FC = () => {
         <input id="my-drawer-3" type="checkbox" className="drawer-toggle" />
         <div className="drawer-content flex flex-col">
           {/* Navbar */}
-          <div className='flex justify-between itmes-center sm:px-10 lg:px-14 xl:px-15'>
+          <div className='flex justify-between itmes-center sm:px-10 lg:px-14 xl:px-15 bg-slate-700'>
             <div className="w-full navbar gap-1 sm:gap-5 ">
               <div className="flex-none lg:hidden">
                 <label htmlFor="my-drawer-3" aria-label="open sidebar" className="btn btn-square btn-ghost">
@@ -78,7 +77,7 @@ const Header: React.FC = () => {
             </div>
           </div>
           {/* Page content here */}
-          <Home />
+          <Outlet />
         </div>
         <div className="drawer-side">
           <label htmlFor="my-drawer-3" aria-label="close sidebar" className="drawer-overlay"></label>
