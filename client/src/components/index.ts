@@ -1,12 +1,13 @@
-import Header from "./Header/Header";
 import Home from "./Home/Home";
 import Footer from "./Footer/Footer";
 import { Profile } from "./Profile/Profile";
-
+import NavBar from "./Header/NavBar";
+import SideDrower from "./Header/SideDrower";
 
 export {
-  Header,
   Home,
   Footer,
-  Profile,
-};
+  NavBar,
+  SideDrower,
+  Profile
+}
