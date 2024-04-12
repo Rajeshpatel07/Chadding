@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react'
 import { motion } from 'framer-motion';
 import axios from 'axios';
 
+axios.defaults.withCredentials = true;
 
 interface button {
   text: string;
@@ -22,12 +23,12 @@ const Login: React.FC<button> = ({ text }) => {
   }
 
   const formSubmit = async (e) => {
-    e.preventdefault();
+    e.preventDefault();
     try {
       const response = await axios.post("/api/login", {
         Email: email,
         Password: password
-      })
+      }, { withCredentials: true })
 
       console.log(response)
     } catch (error) {

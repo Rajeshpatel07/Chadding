@@ -27,3 +27,16 @@ export const getUserVideos = async (req: Request, res: Response) => {
     res.json(error)
   }
 }
+
+export const UpdateProfile=async(req:Request,res:Response)=>{
+  const body=req.body;
+  const file=req.file;
+  if(!body) return res.json({error:"fields are mandatory"})
+
+    try{
+
+    }catch(error){
+      console.log(error);
+      res.json(error)
+    }
+}

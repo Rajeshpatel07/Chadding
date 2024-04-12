@@ -26,6 +26,7 @@ const Signup: React.FC<button> = ({ text }) => {
     e.preventDefault()
     try {
       const response = await axios.post("/api/signup", {
+        Username: username,
         Email: email,
         Password: password
       })
