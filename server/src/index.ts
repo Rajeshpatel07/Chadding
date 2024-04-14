@@ -4,6 +4,7 @@ import router from "./routes/routes.js"
 import { PrismaClient } from "@prisma/client";
 import { Server } from "socket.io";
 import cors from 'cors'
+import cookieParser from 'cookie-parser';
 
 const app = express();
 const server = createServer(app);
@@ -13,6 +14,7 @@ export const prisma = new PrismaClient();
 app.use(cors())
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser())
 app.use('/api', router)
 
 

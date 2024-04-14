@@ -1,5 +1,5 @@
 export interface User {
-  Id: string;
+  Id?: string;
   Username?: string | null;
   Email?: string | null;
   Password?: string | null;
@@ -14,12 +14,13 @@ export interface Video {
   Creator?: {
     Id?: string;
   };
+  VideoPath?:string;
   createdAt?: Date;
   updatedAt?: Date;
 }
 
-export interface userUpdate{
-  Id:string;
-  Username?:string;
-  ProfileImage?:string;
+export interface userUpdate {
+  Id: string;
+  Username?: string;
+  ProfileImage?: string;
 }

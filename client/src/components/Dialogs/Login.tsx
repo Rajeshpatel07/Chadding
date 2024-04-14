@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { motion } from 'framer-motion';
 import axios from 'axios';
 
@@ -10,8 +10,9 @@ interface button {
 
 const Login: React.FC<button> = ({ text }) => {
 
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
+  const [UserId, setUserId] = useState<string | null>(null);
+  const [email, setEmail] = useState<string | null>(null)
+  const [password, setPassword] = useState<string | null>(null);
   const dialogElement = useRef<HTMLDialogElement | null>(null)
 
   const openDialog = () => {
@@ -30,11 +31,20 @@ const Login: React.FC<button> = ({ text }) => {
         Password: password
       }, { withCredentials: true })
 
-      console.log(response)
+      console.log(response.data)
+      setUserId(response.data.userId);
+      if (response.data.userId) {
+        if (dialogElement.current) dialogElement.current.close()
+      }
     } catch (error) {
       console.log(error)
     }
   }
+
+  useEffect(() => {
+    localStorage.setItem("UserId", JSON.stringify(UserId));
+  }, [UserId])
+
   return (
     <>
       < motion.button

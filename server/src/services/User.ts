@@ -1,8 +1,8 @@
 import { prisma } from "../index.js";
-import { User,userUpdate } from "../Interfaces/DBInterfaces.js";
+import { User, userUpdate } from "../Interfaces/DBInterfaces.js";
 
 
-export const CreateUser = async (Username: string, Email: string, Password: string,ProfileImage:string) => {
+export const CreateUser = async (Username: string, Email: string, Password: string, ProfileImage: string) => {
   const newUser: User = await prisma.user.create({
     data: {
       Username,
@@ -22,10 +22,10 @@ export const findSingleUser = async (Email: string) => {
   return user;
 }
 
-export const getSingleUser = async (username: string) => {
-  const user: User = await prisma.user.findUnique({
+export const getSingleUser = async (Id: string) => {
+  const user: User = await prisma.user.findFirst({
     where: {
-      Username: username
+      Id: Id
     }
   }) as User;
 
@@ -33,14 +33,14 @@ export const getSingleUser = async (username: string) => {
 }
 
 
-export const updateUser=async(body:userUpdate,file:object)=>{
-  const newUser=await prisma.user.update({
-    where:{
-      Id:body.Id
+export const updateUser = async (body: userUpdate, file: object) => {
+  const newUser = await prisma.user.update({
+    where: {
+      Id: body.Id
     },
-    data:{
-      Username:body.Username,
-      ProfileImage:file.path
+    data: {
+      Username: body.Username,
+      ProfileImage: file.path
     }
   })
 }

@@ -1,10 +1,20 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import NavItems from '../../Data/NavItems.json'
 import Login from '../Dialogs/Login'
 import Signup from '../Dialogs/Signup'
 
+
 const NavBar: React.FC = () => {
+
+  const [active, setActive] = useState<string | null>(null);
+
+  useEffect(() => {
+    const ID = JSON.parse(localStorage.getItem("UserId"));
+    setActive(ID);
+  }, [])
+
+
   return (
     <div className='flex justify-between itmes-center sm:px-10 lg:px-14 xl:px-15 bg-slate-700'>
       <div className="w-full navbar gap-1 sm:gap-5 ">
@@ -30,10 +40,22 @@ const NavBar: React.FC = () => {
           </ul>
         </div>
       </div>
-      <div className='flex justify-center items-center gap-4 px-4 '>
-        <Signup text="SIGNUP" />
-        <Login text="LOGIN" />
-      </div>
+      {active ?
+        <div className='flex justify-center items-center gap-4 px-4 '>
+          <div className="avatar flex items-center">
+            <div className="w-12 h-12 rounded-full">
+              <Link to="/profile">
+                <img src="https://daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg" />
+              </Link>
+            </div>
+          </div>
+        </div>
+        :
+        <div className='flex justify-center items-center gap-4 px-4 '>
+          <Signup text="SIGNUP" />
+          <Login text="LOGIN" />
+        </div>
+      }
     </div>
   )
 }

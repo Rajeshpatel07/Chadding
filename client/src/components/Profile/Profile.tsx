@@ -1,8 +1,27 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import axios from 'axios';
 
 export const Profile: React.FC = () => {
-
   const [description, setDescription] = useState<boolean>(false);
+
+
+  axios.defaults.withCredentials = true;
+
+  useEffect(() => {
+    (
+      async function() {
+        const Id: string = JSON.parse(localStorage.getItem('UserId'))
+        console.log(Id)
+        try {
+          const response = await axios.get(`/api/profile/${Id}`,)
+          console.log(response)
+
+        } catch (error) {
+          console.log(error)
+        }
+      }
+    )()
+  }, [])
 
   return (
     <div className='flex items-center justify-center' >
