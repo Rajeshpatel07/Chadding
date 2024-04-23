@@ -15,12 +15,11 @@ const signup = async (req: Request, res: Response) => {
     return;
   }
   const ProfileImage: string = "33234234-image.png";
-  console.log(Username, Email, Password, ProfileImage);
 
   try {
     const userpassword: string = await HashPassword(Password)
     const newUser: User = await CreateUser(Username, Email, userpassword, ProfileImage);
-    res.json(newUser);
+    res.json({ msg: "SignUp successful" });
   } catch (error) {
     console.log(error);
     res.json({ msg: "Failed to Signup" });
@@ -38,7 +37,7 @@ const login = async (req: Request, res: Response) => {
     if (await PasswordCompare(Password, user)) {
       const Token = await generateToken(user);
       res.cookie("Token", Token);
-      return res.json({ userId: user.Id })
+      return res.json({ userId: user.Id, username: user.Username })
     } else {
       return res.json({ error: "Incorrect Password" })
     }

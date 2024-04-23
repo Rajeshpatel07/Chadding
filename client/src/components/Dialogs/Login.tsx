@@ -10,9 +10,8 @@ interface button {
 
 const Login: React.FC<button> = ({ text }) => {
 
-  const [UserId, setUserId] = useState<string | null>(null);
-  const [email, setEmail] = useState<string | null>(null)
-  const [password, setPassword] = useState<string | null>(null);
+  const [email, setEmail] = useState<string>("")
+  const [password, setPassword] = useState<string>("");
   const dialogElement = useRef<HTMLDialogElement | null>(null)
 
   const openDialog = () => {
@@ -25,6 +24,7 @@ const Login: React.FC<button> = ({ text }) => {
 
   const formSubmit = async (e) => {
     e.preventDefault();
+    if (email.trim().length < 0 || password.trim().length < 0) return console.log("please enter credentials")
     try {
       const response = await axios.post("/api/login", {
         Email: email,
@@ -32,7 +32,8 @@ const Login: React.FC<button> = ({ text }) => {
       }, { withCredentials: true })
 
       console.log(response.data)
-      setUserId(response.data.userId);
+      localStorage.setItem("UserId", JSON.stringify(response.data.userId));
+      localStorage.setItem("Username", JSON.stringify(response.data.username))
       if (response.data.userId) {
         if (dialogElement.current) dialogElement.current.close()
       }
@@ -41,9 +42,7 @@ const Login: React.FC<button> = ({ text }) => {
     }
   }
 
-  useEffect(() => {
-    localStorage.setItem("UserId", JSON.stringify(UserId));
-  }, [UserId])
+
 
   return (
     <>

@@ -7,12 +7,20 @@ import Signup from '../Dialogs/Signup'
 
 const NavBar: React.FC = () => {
 
-  const [active, setActive] = useState<string | null>(null);
-
-  useEffect(() => {
-    const ID = JSON.parse(localStorage.getItem("UserId"));
-    setActive(ID);
-  }, [])
+  const [active, setActive] = useState<string | null>("");
+  const [Cookie, setCookie] = useState<string | null>("");
+  //
+  // useEffect(() => {
+  //   const ID = JSON.parse(localStorage.getItem("UserId"));
+  //   const cookie = document.cookie;
+  //   if (ID !== undefined && cookie !== undefined) {
+  //     setCookie(cookie);
+  //     setActive(ID);
+  //   } else {
+  //     setCookie("ifojwfi");
+  //     setActive("efojewi")
+  //   }
+  // }, [])
 
 
   return (
@@ -40,7 +48,7 @@ const NavBar: React.FC = () => {
           </ul>
         </div>
       </div>
-      {active ?
+      {active && Cookie ?
         <div className='flex justify-center items-center gap-4 px-4 '>
           <div className="avatar flex items-center">
             <div className="w-12 h-12 rounded-full">
