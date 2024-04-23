@@ -4,6 +4,7 @@ import { Profile } from "./Profile/Profile";
 import NavBar from "./Header/NavBar";
 import SideDrower from "./Header/SideDrower";
 import Video from "./Video/Video";
+import Stream from "./StreamRoom/Stream";
 
 export {
   Home,
@@ -12,4 +13,5 @@ export {
   SideDrower,
   Profile,
   Video,
+  Stream,
 }

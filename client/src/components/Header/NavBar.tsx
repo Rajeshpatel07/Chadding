@@ -7,15 +7,20 @@ import Signup from '../Dialogs/Signup'
 
 const NavBar: React.FC = () => {
 
-  const [active, setActive] = useState<string>("");
-  const [Cookie, setCookie] = useState<string>("");
-
-  useEffect(() => {
-    const ID = JSON.parse(localStorage.getItem("UserId"));
-    const cookie = document.cookie;
-    setCookie(cookie);
-    setActive(ID);
-  }, [])
+  const [active, setActive] = useState<string | null>("");
+  const [Cookie, setCookie] = useState<string | null>("");
+  //
+  // useEffect(() => {
+  //   const ID = JSON.parse(localStorage.getItem("UserId"));
+  //   const cookie = document.cookie;
+  //   if (ID !== undefined && cookie !== undefined) {
+  //     setCookie(cookie);
+  //     setActive(ID);
+  //   } else {
+  //     setCookie("ifojwfi");
+  //     setActive("efojewi")
+  //   }
+  // }, [])
 
 
   return (

@@ -1,5 +1,6 @@
 import React from 'react';
 import Carsual from './Carsual';
+import { Link } from 'react-router-dom';
 import Footer from '../Footer/Footer';
 
 const Home: React.FC = () => {
@@ -28,6 +29,9 @@ const Home: React.FC = () => {
         </div>
         <Footer />
       </main>
+      <div className='absolute'>
+        <Link to="/video" className='px-4 py-2 bg-blue-500 bottom-1 right-1'>Go to video</Link>
+      </div>
     </div>
   )
 }

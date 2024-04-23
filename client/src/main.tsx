@@ -2,13 +2,14 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import './index.css'
 import { createRoutesFromElements, createBrowserRouter, Route, RouterProvider } from 'react-router-dom'
-import { Home, Profile, Video } from './components/index.ts'
+import { Home, Profile, Stream, Video } from './components/index.ts'
 import App from './App.tsx'
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path='/' element={<App />}>
       <Route path='' element={<Home />} />
+      <Route path='stream' element={<Stream />} />
       <Route path='profile' element={<Profile />} />
       <Route path='video' element={<Video />} />
     </Route>

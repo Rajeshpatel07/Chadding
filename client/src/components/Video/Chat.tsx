@@ -25,13 +25,13 @@ const Chat: React.FC = () => {
   }, [othercomments]);
 
   return (
-    <div className='flex flex-col rounded-xl '>
+    <div className='h-full flex flex-col rounded-xl '>
       {/* Live chat */}
-      <div className='bg-base-200 h-20'>
+      <div className='bg-base-200 h-[13%] '>
         <h1 className='text-3xl font-semibold font-serif text-white mt-5 ml-4'>Live Chat</h1>
       </div>
       {/* chat section */}
-      <div className='h-96 w-96 bg-black overflow-y-auto' ref={scrollElement}>
+      <div className='h-[55.5%]  bg-black overflow-y-auto' ref={scrollElement}>
 
 
         {

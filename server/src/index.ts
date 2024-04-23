@@ -26,11 +26,31 @@ app.use('/api', router)
 
 io.on('connection', socket => {
   console.log(socket.id);
+
+  socket.on("join", (data) => {
+    socket.join(data.roomId);
+  })
+
+  socket.on("Offer", (data) => {
+    // console.log("Offer: ", data.offer);
+    socket.broadcast.emit("Offer", { offer: data.offer });
+  })
+
+  socket.on("Answer", (data) => {
+    // console.log("Answer: ", data);
+    socket.broadcast.emit("Answer", { answer: data.answer });
+  })
+
+  socket.on("iceCandidate", (data) => {
+    // console.log("candidate: ", data);
+    socket.broadcast.emit("iceCandidate", { candidate: data.candidate });
+  })
+
   socket.on("comment", data => {
     io.emit("message", data);
   })
 
-  socket.on("disconnection", reason => {
+  socket.on("disconnection", () => {
     console.log("Connection Closed")
   })
 
