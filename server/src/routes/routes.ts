@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { Home, Profile, login, signup } from "../controllers/controllers.js"
 import { checkAuthToken } from "../middlewares/Jwt.js";
-import { AddVideo, GetVideo } from "../controllers/video.controllers.js";
+import { AddVideo, GetVideo, viewer, broadcast } from "../controllers/video.controllers.js";
 import { getUser, getUserVideos, UpdateProfile } from "../controllers/user.controllers.js";
 import { AddComment, getComments } from "../controllers/comment.controllers.js";
 
@@ -22,5 +22,9 @@ router.route("/video").post(AddVideo)
 
 router.route("/video/comment/:Id").get(getComments)
 router.route("/video/comment").post(AddComment)
+
+
+router.route("/broadcast").post(broadcast)
+router.route("/viewer").post(viewer)
 
 export default router;

@@ -1,43 +1,28 @@
-import React from 'react'
-import useRecorder from '../../hooks/useRecorder';
+import React, { useRef } from 'react'
+import useStreamer from '../../hooks/useStreamer'
 
 
 const Video: React.FC = () => {
 
-  const { localVideo, remoteVideo, StartStream, GetPermission, endCall, room, setRoom } = useRecorder();
+  const { localVideoRef, getCameraPermission, startStream, getDisplayPermission } = useStreamer();
 
   return (
-    <div className='h-screen flex items-center justify-center gap-4 '>
-      <div className='flex-col gap-3 justify-center sm:flex '>
-        <div className='flex justify-center gap-6'>
-          <div className="w-72 h-40 border">
-            <video
-              className='w-full h-full'
-              ref={localVideo}
-              autoPlay
-            />
-          </div>
-          <div className="w-72 h-40 border">
-            <video
-              className='w-full h-full'
-              ref={remoteVideo}
-              autoPlay
-            />
-          </div>
-        </div>
-        <div className=' mt-5 flex flex-col justify-center itmes-center gap-5'>
-          <button className='py-2 px-4 rounded-xl bg-blue-500 text-black font-md'
-            onClick={GetPermission}
-          >Permission</button>
-          <button className='py-2 px-4 rounded-xl bg-blue-500 text-black font-md'
-            onClick={StartStream}
-          >start video</button>
-          <button className='py-2 px-4 rounded-xl bg-blue-500 text-black font-md'
-            onClick={endCall}
-          >End Call</button>
-        </div>
-      </div >
-    </div >
+    <div className='h-dvh w-full flex flex-col items-center '>
+      <section className='w-full px-5 flex flex-col items-center rounded-xl'>
+        <section className='w-full mt-5 '>
+          <video
+            className="border  aspect-video rounded-xl "
+            ref={localVideoRef}
+            autoPlay
+          />
+        </section>
+      </section>
+      <div className='flex items-center gap-4'>
+        <button className='btn' onClick={getCameraPermission}>getPermission</button>
+        <button className='btn' onClick={getDisplayPermission}>share Screen</button>
+        <button className='btn' onClick={startStream}>Start stream</button>
+      </div>
+    </div>
   )
 }
 

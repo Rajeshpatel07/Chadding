@@ -5,6 +5,7 @@ import { PrismaClient } from "@prisma/client";
 import { Server } from "socket.io";
 import cors from 'cors'
 import cookieParser from 'cookie-parser';
+import bodyParser from "body-parser";
 
 const app = express();
 const server = createServer(app);
@@ -19,8 +20,9 @@ export const prisma = new PrismaClient();
 
 app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser())
+app.use(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.json())
 app.use('/api', router)
 
 
@@ -29,21 +31,6 @@ io.on('connection', socket => {
 
   socket.on("join", (data) => {
     socket.join(data.roomId);
-  })
-
-  socket.on("Offer", (data) => {
-    // console.log("Offer: ", data.offer);
-    socket.broadcast.emit("Offer", { offer: data.offer });
-  })
-
-  socket.on("Answer", (data) => {
-    // console.log("Answer: ", data);
-    socket.broadcast.emit("Answer", { answer: data.answer });
-  })
-
-  socket.on("iceCandidate", (data) => {
-    // console.log("candidate: ", data);
-    socket.broadcast.emit("iceCandidate", { candidate: data.candidate });
   })
 
   socket.on("comment", data => {
