@@ -2,24 +2,28 @@ import { Response, Request } from "express";
 import { Video } from "../Interfaces/DBInterfaces.js";
 import { addVideo, getSingleVideo } from "../services/Video.js"
 import webrtc from 'wrtc';
-import { send } from "process";
 
 let senderStream: MediaStream;
 
 export const AddVideo = async (req: Request, res: Response) => {
   const { Title, Creator } = req.body;
-  if (!Title || !Creator.Id) return res.sendStatus(403).json({ msg: "All files are mandatory" });
-  const VideoPath = '23234234-jfeo.mp4';
+
+  if (!Title || !Creator || !req.file) {
+    return res.sendStatus(403).json({ msg: "All files are mandatory" });
+  }
 
   try {
-    const newVideo: Video = await addVideo(Title, VideoPath, Creator.Id);
-    res.json(newVideo);
+    // Assuming Multer extracts the path to req.file.path
+    const videoPath = req.file?.path;
+    const newVideo: Video = await addVideo(Title, videoPath, Creator);
+    res.json({ msg: "uploaded successfully" });
   } catch (error) {
     console.log(error);
     res.json({ error: error });
   }
+};
 
-}
+
 export const GetVideo = async (req: Request, res: Response) => {
   const { Id } = req.params;
   if (!Id) return res.json({ msg: "Invalid video Id" })

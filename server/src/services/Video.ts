@@ -1,23 +1,25 @@
 import { prisma } from "../index.js";
-import { Video } from "Interfaces/DBInterfaces";
+import { Video,VideoData } from "Interfaces/DBInterfaces";
+
+
 
 // TODO
-  export const addVideo = async (Title: string,VideoPath:string, creatorId: string) => {
-    const newVideo: Video = await prisma.video.create({
-      data: {
-        Title,
-        Creator: {
-          connect: {
-            Id: creatorId,
-          },
+export const addVideo = async (Title: string, VideoPath: string, creatorId: string) => {
+  const newVideo = await prisma.video.create({
+    data: {
+      Title,
+      Creator: {
+        connect: {
+          Id: creatorId,
         },
-        videoPath:VideoPath,
-        updatedAt: new Date(),
-        
       },
-    });
-    return newVideo;
-  };
+      videoPath: VideoPath,
+      // Removed manual updateAt setting
+    } as VideoData,
+  });
+  return newVideo;
+};
+
 
 export const getSingleVideo = async (Id: string) => {
   const video = await prisma.video.findUnique({

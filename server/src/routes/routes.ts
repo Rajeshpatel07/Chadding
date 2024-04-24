@@ -4,6 +4,7 @@ import { checkAuthToken } from "../middlewares/Jwt.js";
 import { AddVideo, GetVideo, viewer, broadcast } from "../controllers/video.controllers.js";
 import { getUser, getUserVideos, UpdateProfile } from "../controllers/user.controllers.js";
 import { AddComment, getComments } from "../controllers/comment.controllers.js";
+import upload from "../services/Multer.js"
 
 
 const router: Router = Router();
@@ -18,7 +19,7 @@ router.route("/user/videos/:Id").get(getUserVideos)
 router.route("/user/updateprofile").post(UpdateProfile)
 
 router.route("/video/:Id").get(GetVideo)
-router.route("/video").post(AddVideo)
+router.route("/video").post(upload.single('video'), AddVideo);
 
 router.route("/video/comment/:Id").get(getComments)
 router.route("/video/comment").post(AddComment)
