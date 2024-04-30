@@ -1,3 +1,4 @@
+import { Request } from "express";
 import { prisma } from "../index.js";
 import { User, userUpdate } from "../Interfaces/DBInterfaces.js";
 
@@ -33,7 +34,7 @@ export const getSingleUser = async (Id: string) => {
 }
 
 
-export const updateUser = async (body: userUpdate, file: object) => {
+export const updateUser = async (body: userUpdate, file: Request) => {
   const newUser = await prisma.user.update({
     where: {
       Id: body.Id
@@ -43,4 +44,5 @@ export const updateUser = async (body: userUpdate, file: object) => {
       ProfileImage: file.path
     }
   })
+  return newUser;
 }

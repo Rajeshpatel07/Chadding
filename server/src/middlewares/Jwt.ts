@@ -1,5 +1,5 @@
 
-import Jwt, { VerifyErrors } from 'jsonwebtoken';
+import Jwt, { JsonWebTokenError } from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 import { config } from 'dotenv';
 config();
@@ -13,11 +13,10 @@ export const checkAuthToken = (req: Request, res: Response, next: NextFunction) 
   const { Token } = req.cookies;
   const secret_key: string = process.env.SECRET_KEY || 'defaultSecretKey';
 
-  if (!Token) return res.sendStatus(401).json({ msg: "You are not allowed" });
+  if (!Token) return res.json({ error: "You are not allowed" });
 
-  Jwt.verify(Token, secret_key, (err: VerifyErrors | null, decode: decode | null) => {
+  Jwt.verify(Token, secret_key, (err: JsonWebTokenError | unknown, decode: decode | unknown) => {
     if (err) return res.sendStatus(401);
-    console.log(decode);
     next();
   });
 };

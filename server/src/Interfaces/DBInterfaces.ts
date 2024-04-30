@@ -8,14 +8,10 @@ export interface User {
   updatedAt?: Date;
 }
 
-interface User {
-  Id: string;
-}
-
 export interface Video {
   Id: string;
   Title: string;
-  Creator: User;
+  Creator: string;
   videoPath: string;
   createdAt: Date;
   updatedAt: Date;
@@ -30,11 +26,7 @@ export interface userUpdate {
 
 export interface VideoData {
   Title: string;
-  Creator: {
-    connect: {
-      Id: string;
-    }
-  }
+  CreatedBy: string;
   videoPath: string;
-  updatedAt: Date;
 }
+

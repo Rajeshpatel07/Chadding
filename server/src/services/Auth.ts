@@ -4,6 +4,10 @@ import { User } from "../Interfaces/DBInterfaces.js"
 import dotenv from "dotenv";
 dotenv.config();
 
+interface payload {
+  ID: string | unknown;
+}
+
 export const HashPassword = async (Password: string) => {
   return await hash(Password, 10);
 }
@@ -19,7 +23,7 @@ export const PasswordCompare = async (Password: string, user: User) => {
 export const generateToken = async (user: User) => {
   if (user) {
     const secretKey = process.env.SECRET_KEY || 'defaultSecretKey';
-    const payload: { ID: string | null } = { ID: user.Id }
+    const payload: payload = { ID: user.Id };
     return await jwt.sign(payload, secretKey);
   }
 }

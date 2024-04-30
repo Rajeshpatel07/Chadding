@@ -1,10 +1,12 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useMemo } from 'react'
 import { peerConnection } from '../services/Webrtc'
 import axios from 'axios';
+import { io } from 'socket.io-client';
 
 
 const useStreamer = () => {
 
+  const socket = useMemo(() => io('http://localhost:5000', { autoConnect: false }), []);
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
   const localVideoRef = useRef<HTMLVideoElement | null>(null);
   const mediaRecorder = useRef<MediaRecorder | null>(null)
@@ -27,6 +29,7 @@ const useStreamer = () => {
 
   const getDisplayPermission = async () => {
     try {
+      //Getting the userMedia
       const stream = await navigator.mediaDevices.getDisplayMedia({ video: true });
       setLocalStream(stream);
       if (localVideoRef.current) {
@@ -41,15 +44,21 @@ const useStreamer = () => {
   const startStream = async () => {
     try {
       if (peerConnection.peer) {
-        console.log("one")
         peerConnection.peer.onnegotiationneeded = () => handleNegotiationNeededEvent();
 
+        //pushing the localstream to the peerConnection
         localStream?.getTracks().forEach(track => {
           console.log("localStream tracks", track)
           peerConnection.peer?.addTrack(track, localStream);
         });
       }
-      recordMedia(localStream)
+      //Recording the Stream
+      if (localStream) {
+        recordMedia(localStream)
+      }
+      socket.connect();
+
+
     } catch (error) {
       console.log(error)
     }
@@ -57,16 +66,20 @@ const useStreamer = () => {
 
   const handleNegotiationNeededEvent = async () => {
     try {
-      console.log("two")
 
       await peerConnection.createOffer();
       const payload = {
-        sdp: peerConnection.peer?.localDescription
+        sdp: peerConnection.peer?.localDescription,
+        userId: JSON.parse(localStorage.getItem('UserId'))
       };
 
       const { data } = await axios.post('/api/broadcast', payload);
       const desc = new RTCSessionDescription(data.sdp);
       await peerConnection.setAnswer(desc)
+      socket.emit("join:streamer", {
+        name: JSON.parse(localStorage.getItem('Username')),
+        Id: JSON.parse(localStorage.getItem("UserId"))
+      })
 
     } catch (error) {
       console.log(error)
@@ -93,13 +106,16 @@ const useStreamer = () => {
         mediaRecorder.current.ondataavailable = async (event) => {
           chunks.current.push(event.data);
           const superbuffer = new Blob(chunks.current);
+          console.log(superbuffer);
+          console.log(chunks);
 
           try {
             const formData = new FormData();
-            formData.append('video', superbuffer, 'test.mp4');
+            formData.append('video', superbuffer, VideoTitle.current?.value);
             formData.append("Title", VideoTitle.current?.value);
-            formData.append("Creator", JSON.parse(localStorage.getItem('UserId')))
+            formData.append("CreatedBy", JSON.parse(localStorage.getItem('UserId')))
             const response = await axios.post('/api/video', formData);
+            console.log("formData", formData)
             console.log(response)
           } catch (error) {
             console.log(error);

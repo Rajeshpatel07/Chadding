@@ -3,9 +3,9 @@ import { motion } from 'framer-motion'
 
 const Footer: React.FC = () => {
   return (
-    <footer className="bg-gray-800 w-full bg-transparent border">
+    <footer className="bg-gray-800 w-full bg-transparent ">
       <div className="container flex flex-col px-4 py-6 mx-auto md:p-8 lg:flex-row divide-gray-400 dark:divide-gray-600">
-        <ul className="self-center py-6 space-y-4 text-center sm:flex sm:space-y-0 sm:justify-around sm:space-x-4 lg:flex-1 lg:justify-start">
+        <ul className="self-center flex py-6 text-center  space-y-0 justify-around space-x-4 lg:flex-1 lg:justify-start">
           <li className='text-lg text-white'>About</li>
           <li className='text-lg text-white'>Blog</li>
           <li className='text-lg text-white'>Contact</li>
