@@ -4,9 +4,31 @@ import { addVideo, getSingleVideo } from "../services/Video.js"
 import webrtc from 'wrtc';
 import { liveStreamsInterface, StreamerId, streamerStreams } from "Interfaces/Interface.js";
 
+const Servers = {
+  iceServers: [
+    {
+      urls: [
+        'stun:stun1.l.google.com:19302',
+        'stun:stun2.l.google.com:19302'
+      ]
+    },
+    {
+      urls: 'turn:openrelay.metered.ca:80',
+      username: 'openrelayproject',
+      credential: 'openrelayproject'
+  }
+  ]
+}
 
-export let senderStream:Array<streamerStreams>=[];
-export let liveStreams:Array<liveStreamsInterface>=[];
+// {
+//       url: 'turn:192.158.29.39:3478?transport=udp',
+//       username: '28224511:1379330808',
+//       credential: 'JZEOEt2V3Qb0y27GRntt2u2PAYA='
+// },
+
+
+export let senderStream: Array<streamerStreams> = [];
+export let liveStreams: Array<liveStreamsInterface> = [];
 
 export const AddVideo = async (req: Request, res: Response) => {
   const { Title, Creator } = req.body;
@@ -43,16 +65,11 @@ export const GetVideo = async (req: Request, res: Response) => {
 
 export const broadcast = async (req: Request, res: Response) => {
   const body = req.body;
+  console.log("request for broadcast");
   try {
 
-    const peer = new webrtc.RTCPeerConnection({
-      iceServers: [
-        {
-          urls: "stun:stun.stunprotocol.org"
-        }
-      ]
-    });
-    peer.ontrack = (e:RTCTrackEvent) => handleTrackEvent(e,req);
+    const peer = new webrtc.RTCPeerConnection(Servers);
+    peer.ontrack = (e: RTCTrackEvent) => handleTrackEvent(e, req);
     const desc = new webrtc.RTCSessionDescription(body.sdp);
     await peer.setRemoteDescription(desc);
     const answer = await peer.createAnswer();
@@ -67,33 +84,25 @@ export const broadcast = async (req: Request, res: Response) => {
   }
 }
 
-function handleTrackEvent(e:RTCTrackEvent,req:Request) {
+function handleTrackEvent(e: RTCTrackEvent, req: Request) {
   senderStream.push({
-    userId:req.body.userId,
-    MediaStream:e.streams[0]
+    userId: req.body.userId,
+    MediaStream: e.streams[0]
   })
-//   console.log(senderStream)
+  //   console.log(senderStream)
 };
 
 export const viewer = async (req: Request, res: Response) => {
   const body = req.body;
+  console.log("Request for viewer")
   try {
-
-    const peer = new webrtc.RTCPeerConnection({
-      iceServers: [
-        {
-          urls: [
-            'stun:stun1.l.google.com:19302',
-            'stun:stun2.l.google.com:19302'
-          ]
-        }
-      ]
-    }); const desc = new webrtc.RTCSessionDescription(body.sdp);
+    const peer = new webrtc.RTCPeerConnection(Servers);
+    const desc = new webrtc.RTCSessionDescription(body.sdp);
     await peer.setRemoteDescription(desc);
     if (liveStreams) {
-        const singleStreamer=liveStreams.find((stream)=>{
-            return stream.socketId == body.roomId
-          })
+      const singleStreamer = liveStreams.find((stream) => {
+        return stream.socketId == body.roomId
+      })
       singleStreamer?.MediaStream.getTracks().forEach(track => peer.addTrack(track, singleStreamer?.MediaStream));
     }
     const answer = await peer.createAnswer();
@@ -109,9 +118,9 @@ export const viewer = async (req: Request, res: Response) => {
   }
 }
 
-export const getLiveStreams=(req:Request,res:Response)=>{
-    if(liveStreams.length <0){
-        return res.json({msg:"No live streams found"});
-    }
-    return res.json(liveStreams);
+export const getLiveStreams = (req: Request, res: Response) => {
+  if (liveStreams.length < 0) {
+    return res.json({ msg: "No live streams found" });
+  }
+  return res.json(liveStreams);
 }

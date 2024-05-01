@@ -8,7 +8,7 @@ const Stream: React.FC = () => {
 
   useEffect(() => {
     init();
-  }, [])
+  })
 
   return (
     <Suspense fallback={<Loading />}>
