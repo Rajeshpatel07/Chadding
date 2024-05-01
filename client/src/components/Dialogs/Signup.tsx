@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, FormEvent } from 'react'
 import { motion } from 'framer-motion';
 import axios from 'axios';
 
@@ -22,7 +22,7 @@ const Signup: React.FC<button> = ({ text }) => {
     if (dialogElement.current) dialogElement.current.close()
   }
 
-  const formSubmit = async (e) => {
+  const formSubmit = async (e:FormEvent) => {
     e.preventDefault()
     try {
       const response = await axios.post("/api/signup", {

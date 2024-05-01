@@ -9,18 +9,24 @@ export interface User {
 }
 
 export interface Video {
-  Id?: string;
-  Title?: string;
-  Creator?: {
-    Id?: string;
-  };
-  VideoPath?:string;
-  createdAt?: Date;
-  updatedAt?: Date;
+  Id: string;
+  Title: string;
+  Creator: string;
+  videoPath: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
+
 
 export interface userUpdate {
   Id: string;
   Username?: string;
   ProfileImage?: string;
 }
+
+export interface VideoData {
+  Title: string;
+  CreatedBy: string;
+  videoPath: string;
+}
+

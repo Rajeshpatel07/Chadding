@@ -1,0 +1,19 @@
+export interface liveStreamsInterface {
+  streamerName: string;
+  streamerId: string;
+  Thumbnail: string;
+  socketId: string;
+  MediaStream: MediaStream;
+}
+
+interface IceServer {
+  urls: string | string[];
+  username?: string;
+  credential?: string;
+}
+
+export interface Configuration {
+  iceServers: IceServer[];
+}
+
+

@@ -13,6 +13,7 @@ lerna-debug.log*
 
 req.rest
 server/src/prisma/migrations
+Storage
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json

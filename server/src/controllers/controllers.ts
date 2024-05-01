@@ -5,7 +5,7 @@ import { CreateUser, findSingleUser, getSingleUser } from "../services/User.js"
 import { UserVideos } from "../services/Video.js";
 
 const Home = (req: Request, res: Response) => {
-  res.json({ msg: "This is home Route" });
+  res.json({ msg:"Safe Route" });
 };
 
 const signup = async (req: Request, res: Response) => {

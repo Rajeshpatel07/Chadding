@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios';
+import { useParams } from 'react-router-dom';
+
 
 export const Profile: React.FC = () => {
   const [description, setDescription] = useState<boolean>(false);
-
+  const params = useParams();
+  console.log(params)
 
   axios.defaults.withCredentials = true;
 

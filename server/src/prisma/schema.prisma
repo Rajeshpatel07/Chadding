@@ -8,34 +8,34 @@ datasource db {
 }
 
 model User {
-  Id        String   @id @default(uuid())
-  Username  String   @unique
-  Email     String   @unique
-  Password  String
-  ProfileImage String
-  Role      String   @default("user")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  videos    Video[]
-  comments  Comment[]
+  Id           String    @id @default(uuid())
+  Username     String    @unique
+  Email        String    @unique
+  Password     String
+  ProfileImage String    @default("null")
+  Role         String    @default("user")
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  videos       Video[]
+  comments     Comment[]
 }
 
 model Video {
   Id        String    @id @default(uuid())
   Title     String
-  Creator   User      @relation(fields: [CreatedBy],references: [Id])
+  Creator   User      @relation(fields: [CreatedBy], references: [Id])
   CreatedBy String
   videoPath String
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  comments Comment[]
+  comments  Comment[]
 }
 
 model Comment {
   Id        String @id @default(uuid())
   comment   String
-  video     Video  @relation(fields: [videoId],references: [Id])
-  videoId  String
-  Creator   User   @relation(fields: [CreatedBy],references: [Id])
+  video     Video  @relation(fields: [videoId], references: [Id])
+  videoId   String
+  Creator   User   @relation(fields: [CreatedBy], references: [Id])
   CreatedBy String
 }

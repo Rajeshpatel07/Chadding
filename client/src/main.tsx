@@ -9,8 +9,8 @@ const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path='/' element={<App />}>
       <Route path='' element={<Home />} />
-      <Route path='stream' element={<Stream />} />
-      <Route path='profile' element={<Profile />} />
+      <Route path='/:username/:streamId' element={<Stream />} />
+      <Route path='/:username' element={<Profile />} />
       <Route path='video' element={<Video />} />
     </Route>
   )

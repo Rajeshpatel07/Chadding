@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, FormEvent } from 'react'
 import { motion } from 'framer-motion';
 import axios from 'axios';
 
@@ -22,7 +22,7 @@ const Login: React.FC<button> = ({ text }) => {
     if (dialogElement.current) dialogElement.current.close()
   }
 
-  const formSubmit = async (e) => {
+  const formSubmit = async (e:FormEvent) => {
     e.preventDefault();
     if (email.trim().length < 0 || password.trim().length < 0) return console.log("please enter credentials")
     try {
@@ -36,6 +36,7 @@ const Login: React.FC<button> = ({ text }) => {
       localStorage.setItem("Username", JSON.stringify(response.data.username))
       if (response.data.userId) {
         if (dialogElement.current) dialogElement.current.close()
+          window.location.reload();
       }
     } catch (error) {
       console.log(error)
