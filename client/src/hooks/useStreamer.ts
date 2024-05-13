@@ -8,6 +8,7 @@ const useStreamer = () => {
 
   const socket = useMemo(() => io('http://localhost:5000', { autoConnect: false }), []);
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
+  const [check, setCheck] = useState<boolean>(false);
   const localVideoRef = useRef<HTMLVideoElement | null>(null);
   const mediaRecorder = useRef<MediaRecorder | null>(null)
   const chunks = useRef<Array<Blob>>([]);
@@ -19,6 +20,9 @@ const useStreamer = () => {
       setLocalStream(stream);
       if (localVideoRef.current) {
         localVideoRef.current.srcObject = stream;
+        console.log("Stream", stream)
+      } else {
+        console.log("localVideoRef is undefined")
       }
 
     } catch (error) {
@@ -53,7 +57,7 @@ const useStreamer = () => {
         });
       }
       //Recording the Stream
-      if (localStream) {
+      if (localStream && check) {
         recordMedia(localStream)
       }
       socket.connect();
@@ -70,15 +74,15 @@ const useStreamer = () => {
       await peerConnection.createOffer();
       const payload = {
         sdp: peerConnection.peer?.localDescription,
-        userId: JSON.parse(localStorage.getItem('UserId'))
+        userId: JSON.parse(localStorage.getItem('UserId') || '""')
       };
 
       const { data } = await axios.post('/api/broadcast', payload);
       const desc = new RTCSessionDescription(data.sdp);
       await peerConnection.setAnswer(desc)
       socket.emit("join:streamer", {
-        name: JSON.parse(localStorage.getItem('Username')),
-        Id: JSON.parse(localStorage.getItem("UserId"))
+        name: JSON.parse(localStorage.getItem('Username') || '""'),
+        Id: JSON.parse(localStorage.getItem("UserId") || '""')
       })
 
     } catch (error) {
@@ -86,13 +90,24 @@ const useStreamer = () => {
     }
   }
 
-  const endStream = () => {
+  const endStream = async () => {
     if (localStream) {
       localStream.getTracks().forEach(track => {
         track.stop();
       })
-      mediaRecorder.current?.stop();
+      if (check) {
+        mediaRecorder.current?.stop();
+      }
       peerConnection.peer?.close();
+      try {
+        const response = await axios.post("/api/stopstream", {
+          CreatedBy: JSON.parse(localStorage.getItem("UserId") || '""')
+        })
+        console.log(response);
+      } catch (error) {
+        console.log(error)
+      }
+
     }
   }
 
@@ -102,25 +117,27 @@ const useStreamer = () => {
     mediaRecorder.current.onstart = () => {
       console.log("MediaRecorder started recording");
       if (mediaRecorder.current) {
+        if (check) {
+          mediaRecorder.current.ondataavailable = async (event) => {
+            chunks.current.push(event.data);
+            const superbuffer = new Blob(chunks.current);
+            console.log(superbuffer);
+            console.log(chunks);
 
-        mediaRecorder.current.ondataavailable = async (event) => {
-          chunks.current.push(event.data);
-          const superbuffer = new Blob(chunks.current);
-          console.log(superbuffer);
-          console.log(chunks);
-
-          try {
-            const formData = new FormData();
-            formData.append('video', superbuffer, VideoTitle.current?.value);
-            formData.append("Title", VideoTitle.current?.value);
-            formData.append("CreatedBy", JSON.parse(localStorage.getItem('UserId')))
-            const response = await axios.post('/api/video', formData);
-            console.log("formData", formData)
-            console.log(response)
-          } catch (error) {
-            console.log(error);
-          }
-        };
+            try {
+              const formData = new FormData();
+              formData.append('video', superbuffer, VideoTitle.current?.value);
+              formData.append("Title", (VideoTitle.current?.value || '""'));
+              formData.append("CreatedBy", JSON.parse(localStorage.getItem('UserId') || '""'))
+              console.log(localStorage.getItem('UserId'));
+              const response = await axios.post('/api/video', formData);
+              console.log("formData", formData)
+              console.log(response)
+            } catch (error) {
+              console.log(error);
+            }
+          };
+        }
       }
     };
 
@@ -134,6 +151,8 @@ const useStreamer = () => {
     getDisplayPermission,
     endStream,
     VideoTitle,
+    setCheck,
+    check
   }
 }
 

@@ -15,7 +15,7 @@ export const addVideo = async (Title: string, VideoPath: string, creatorId: stri
     });
     return newVideo;
   } catch (error) {
-    console.log(error)
+   return error; 
   }
 };
 
@@ -48,3 +48,12 @@ export const UserVideos = async (Id: string) => {
   }
 }
 
+export const Videos = async () => {
+  try {
+    const videos = await prisma.video.findMany({})
+    return videos;
+
+  } catch (error) {
+    console.log(error)
+  }
+}

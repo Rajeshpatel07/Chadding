@@ -8,7 +8,7 @@ interface button {
   text: string;
 }
 
-const Login: React.FC<button> = ({ text }) => {
+const Login: React.FC = () => {
 
   const [email, setEmail] = useState<string>("")
   const [password, setPassword] = useState<string>("");
@@ -22,7 +22,7 @@ const Login: React.FC<button> = ({ text }) => {
     if (dialogElement.current) dialogElement.current.close()
   }
 
-  const formSubmit = async (e:FormEvent) => {
+  const formSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (email.trim().length < 0 || password.trim().length < 0) return console.log("please enter credentials")
     try {
@@ -36,7 +36,7 @@ const Login: React.FC<button> = ({ text }) => {
       localStorage.setItem("Username", JSON.stringify(response.data.username))
       if (response.data.userId) {
         if (dialogElement.current) dialogElement.current.close()
-          window.location.reload();
+        window.location.reload();
       }
     } catch (error) {
       console.log(error)
@@ -51,7 +51,7 @@ const Login: React.FC<button> = ({ text }) => {
         whileHover={{
           scale: 1.04
         }}
-        className="px-7 py-2 bg-white rounded-3xl text-black font-medium" onClick={openDialog}>{text}</motion.button >
+        className="px-7 py-2 bg-white rounded-3xl text-black font-medium" onClick={openDialog}>LOGIN</motion.button >
       <dialog className="modal"
         ref={dialogElement}
       >

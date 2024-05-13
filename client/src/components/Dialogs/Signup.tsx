@@ -2,12 +2,7 @@ import React, { useState, useRef, FormEvent } from 'react'
 import { motion } from 'framer-motion';
 import axios from 'axios';
 
-
-interface button {
-  text: string;
-}
-
-const Signup: React.FC<button> = ({ text }) => {
+const Signup: React.FC = () => {
 
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -22,7 +17,7 @@ const Signup: React.FC<button> = ({ text }) => {
     if (dialogElement.current) dialogElement.current.close()
   }
 
-  const formSubmit = async (e:FormEvent) => {
+  const formSubmit = async (e: FormEvent) => {
     e.preventDefault()
     try {
       const response = await axios.post("/api/signup", {
@@ -43,7 +38,7 @@ const Signup: React.FC<button> = ({ text }) => {
         whileHover={{
           scale: 1.04
         }}
-        className="px-6 py-2 rounded-3xl text-white border font-medium" onClick={openDialog}>{text}</motion.button >
+        className="px-6 py-2 rounded-3xl text-white border font-medium" onClick={openDialog}>SIGNUP</motion.button >
       <dialog id="dialog" className="modal"
         ref={dialogElement}
       >

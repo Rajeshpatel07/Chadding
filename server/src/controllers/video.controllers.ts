@@ -1,6 +1,6 @@
 import { Response, Request } from "express";
 import { Video } from "../Interfaces/DBInterfaces.js";
-import { addVideo, getSingleVideo } from "../services/Video.js"
+import { addVideo, getSingleVideo, Videos } from "../services/Video.js"
 import webrtc from 'wrtc';
 import { liveStreamsInterface, StreamerId, streamerStreams } from "Interfaces/Interface.js";
 
@@ -16,7 +16,7 @@ const Servers = {
       urls: 'turn:openrelay.metered.ca:80',
       username: 'openrelayproject',
       credential: 'openrelayproject'
-  }
+    }
   ]
 }
 
@@ -31,16 +31,18 @@ export let senderStream: Array<streamerStreams> = [];
 export let liveStreams: Array<liveStreamsInterface> = [];
 
 export const AddVideo = async (req: Request, res: Response) => {
-  const { Title, Creator } = req.body;
+  const { Title, CreatedBy } = req.body;
 
-  if (!Title || !Creator || !req.file) {
+  if (!Title || !CreatedBy || !req.file) {
     return res.sendStatus(403).json({ msg: "All files are mandatory" });
   }
 
+
   try {
+
     // Assuming Multer extracts the path to req.file.path
-    const videoPath = req.file?.path;
-    const newVideo = await addVideo(Title, videoPath, Creator);
+    const videoPath = `../../${req.file?.path}`;
+    const newVideo = await addVideo(Title, videoPath, CreatedBy);
     return res.json(newVideo);
   } catch (error) {
     console.log(error);
@@ -118,9 +120,23 @@ export const viewer = async (req: Request, res: Response) => {
   }
 }
 
-export const getLiveStreams = (req: Request, res: Response) => {
+export const getLiveStreams = async (req: Request, res: Response) => {
   if (liveStreams.length < 0) {
     return res.json({ msg: "No live streams found" });
   }
-  return res.json(liveStreams);
+  try {
+    const videos = await Videos();
+    return res.json({ liveStreams, videos });
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export const endStream = (req: Request, res: Response) => {
+  const { CreatedBy } = req.body;
+  console.log("request to stop Stream", liveStreams);
+  liveStreams = liveStreams.filter(stream => {
+    stream.streamerId != CreatedBy;
+  })
+  res.json({ msg: "success", liveStreams })
 }
