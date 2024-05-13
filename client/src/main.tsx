@@ -10,7 +10,7 @@ const router = createBrowserRouter(
     <Route path='/' element={<App />}>
       <Route path='' element={<Home />} />
       <Route path='/:username/:streamId' element={<Stream />} />
-      <Route path='/:username' element={<Profile />} />
+      <Route path='/profile' element={<Profile />} />
       <Route path='video' element={<Video />} />
     </Route>
   )

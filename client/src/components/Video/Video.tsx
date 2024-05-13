@@ -1,30 +1,109 @@
-import React, { useRef } from 'react'
+import React, { FormEvent, useEffect, useState, ChangeEvent, useRef, Suspense } from 'react'
 import useStreamer from '../../hooks/useStreamer'
+import Chat from './Chat';
+import Loading from '../Extra/Loading';
 
 
 const Video: React.FC = () => {
 
-  const { localVideoRef, getCameraPermission, endStream, startStream, VideoTitle, getDisplayPermission } = useStreamer();
+  const [edit, setEdit] = useState<boolean>(false);
+  const [file, setFile] = useState<File | null>(null); // Add a state variable to store the selected file
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [readonly, setReadonly] = useState<boolean>(false);
+
+
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    setEdit(true)
+    setReadonly(true);
+    startStream();
+  }
+
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setFile(e.target.files[0]); // Update the file state when a file is selected
+    }
+  }
+
+  useEffect(() => {
+    if (!file) {
+      return;
+    }
+    const reader: FileReader = new FileReader();
+    reader.onloadend = () => {
+      setPreviewUrl(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  }, [file]);
+
+
+
+  const { localVideoRef, getCameraPermission, endStream, startStream, VideoTitle, getDisplayPermission, check, setCheck } = useStreamer();
+
+  console.log("localVideoRef", localVideoRef)
 
   return (
-    <div className='h-dvh w-full flex flex-col items-center '>
-      <section className='w-full px-5 flex flex-col items-center rounded-xl'>
-        <section className='w-96 h-72 mt-5 '>
-          <video
-            className="border w-full h-full rounded-xl "
-            ref={localVideoRef}
-            autoPlay
-          />
-        </section>
-      </section>
-      <div className='flex items-center gap-4 mt-5'>
-        <input type="text" className='input' ref={VideoTitle} />
-        <button className='btn' onClick={getCameraPermission}>getPermission</button>
-        <button className='btn' onClick={getDisplayPermission}>share Screen</button>
-        <button className='btn' onClick={startStream}>Start stream</button>
-        <button className='btn' onClick={endStream}>End Stream</button>
-      </div>
-    </div>
+    <Suspense fallback={<Loading />}>
+      <div className="w-[100vw] md:w-[96.5vw] h-auto">
+        <div className="flex flex-col justify-center  py-4 xl:py-6 mx-auto bg-gray-800">
+          <section className='flex flex-col justify-center gap-3 md:flex-row box-border'>
+            <div className='flex flex-col justify-start md:w-[73%]'>
+              <div className="flex flex-col gap-3 justify-center w-full ">
+                <video className='w-full  h-64  md:h-46  bg-black' ref={localVideoRef} autoPlay />
+                <div className='flex justify-between items-center  flex-wrap p-5'>
+
+                  {/* Form Input */}
+                  <section className="flex flex-col justify-center w-full">
+                    <button className="btn" onClick={getCameraPermission}>getCameraPermission</button>
+                    <button className="btn" onClick={getDisplayPermission}>Screen Share</button>
+                    {edit &&
+                      <div className="flex justify-end ">
+                        <button className="px-6 py-2 rounded bg-gray-700 text-white text-lg"
+                          onClick={() => setReadonly(prev => !prev)}
+                        >{edit ? "Save" : "Edit"}</button>
+                      </div>
+                    }
+                    <div className='space-y-3'>
+                      <label className='text-white text-xl font-medium' htmlFor="title">Title
+                        <span className='text-red-500'>*</span>
+                      </label>
+                      <br />
+                      <input type="text" id='title' ref={VideoTitle} placeholder='Enter the video Title..' readOnly={readonly}
+                        className='py-2 px-2 text-lg placeholder-white text-white bg-black rounded-lg outline-none w-[50vw]' />
+                    </div>
+                    <div className="flex flex-col gap-3 mt-5">
+                      <label htmlFor="files" className="block text-xl text-white font-medium">Thumbnail
+                        <span className='text-red-500'>*</span>
+                      </label>
+                      <div className="flex flex-col items-center md:flex-row gap-5">
+                        <input type="file" onChange={handleFileChange} className="file-input file-input-bordered w-96" readOnly={readonly} />
+                        {previewUrl && <img src={previewUrl} alt="Preview" className="w-64" />}
+                      </div>
+                    </div>
+                    <div className="mt-5 flex gap-3">
+                      <input type="checkbox" id="checkbox" className="w-5 h-5" checked={check} onChange={() => setCheck(prev => !prev)} />
+                      <label htmlFor="checkbox" className="text-white text-md">If you want to upload you stream to the server</label>
+                    </div>
+                    <div className="mt-5 flex items-center gap-5">
+                      <button className="px-10 py-3 rounded-lg bg-violet-500 text-xl text-white"
+                        onClick={handleSubmit}
+                      >Start</button>
+                      <button className="px-10 py-3 rounded-lg bg-violet-500 text-xl text-white"
+                        onClick={endStream}
+                      >Stop</button>
+                    </div>
+                  </section>
+
+                </div>
+              </div>
+            </div>
+            <div className='w-full md:w-[24%]   '>
+              <Chat />
+            </div>
+          </section>
+        </div>
+      </div >
+    </Suspense >
   )
 }
 

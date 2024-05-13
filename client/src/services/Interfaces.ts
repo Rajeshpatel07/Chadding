@@ -16,4 +16,8 @@ export interface Configuration {
   iceServers: IceServer[];
 }
 
-
+export interface fileInput{
+  target:{
+    files:Array<File>;
+  };
+}
