@@ -3,6 +3,7 @@ const Carsual = lazy(() => import('./Carsual'))
 import { liveStreamsInterface } from '../../services/Interfaces';
 import axios from 'axios';
 const Loading = lazy(() => import("../Extra/Loading"))
+import { Link } from 'react-router-dom';
 
 const Home: React.FC = () => {
   const [liveStream, setLiveStream] = useState<Array<liveStreamsInterface>>([])
@@ -32,9 +33,9 @@ const Home: React.FC = () => {
               <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quam, natus.</p>
             </div>
           </div>
-          <div className="flex items-center justify-center aspect-video p-6 mt-8 lg:mt-0  sm:h-80 lg:h-96 xl:h-105 2xl:h-112 rounded-xl">
+          <Link to={`/mike@124/watch/44b35123-9f8e-41d0-bebe-185a4b97f2ce`} className="flex items-center justify-center aspect-video p-6 mt-8 lg:mt-0  sm:h-80 lg:h-96 xl:h-105 2xl:h-112 rounded-xl">
             <video src="" className='border  w-full h-full rounded-xl'></video>
-          </div>
+          </Link>
         </div>
         <Carsual link="Top" Stream={liveStream} />
         <Carsual link="Top" Stream={liveStream} />

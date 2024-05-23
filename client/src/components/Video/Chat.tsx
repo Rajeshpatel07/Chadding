@@ -28,8 +28,8 @@ const Message: React.FC = () => {
   return (
     <>
       {
-        comment.map(item => (
-          <section key={item.comment} className='flex items-center gap-3 py-2'>
+        comment.map((item, index) => (
+          <section key={index} className='flex items-center gap-3 py-2'>
             <div className='w-10 h-10 self-start'>
               <img src="/favicon.png" alt="img" className='w-full h-full bg-cover bg-center' />
             </div>

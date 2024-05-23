@@ -2,7 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import './index.css'
 import { createRoutesFromElements, createBrowserRouter, Route, RouterProvider } from 'react-router-dom'
-import { Home, Profile, Stream, Video } from './components/index.ts'
+import { Home, Profile, Stream, Video, VideoElement } from './components/index.ts'
 import App from './App.tsx'
 
 const router = createBrowserRouter(
@@ -10,6 +10,7 @@ const router = createBrowserRouter(
     <Route path='/' element={<App />}>
       <Route path='' element={<Home />} />
       <Route path='/:username/:streamId' element={<Stream />} />
+      <Route path='/:username/watch/:videoId' element={<VideoElement />} />
       <Route path='/profile' element={<Profile />} />
       <Route path='video' element={<Video />} />
     </Route>

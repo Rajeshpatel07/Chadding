@@ -8,7 +8,7 @@ export interface User {
   updatedAt?: Date;
 }
 
-export interface Video {
+export interface VideoInterface {
   Id: string;
   Title: string;
   Creator: string;
