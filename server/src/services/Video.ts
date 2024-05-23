@@ -1,5 +1,5 @@
 import { prisma } from "../index.js";
-import { Video, VideoData } from "Interfaces/DBInterfaces";
+import { VideoInterface, VideoData } from "Interfaces/DBInterfaces";
 
 
 
@@ -15,7 +15,7 @@ export const addVideo = async (Title: string, VideoPath: string, creatorId: stri
     });
     return newVideo;
   } catch (error) {
-   return error; 
+    return error;
   }
 };
 
@@ -29,7 +29,7 @@ export const getSingleVideo = async (Id: string) => {
     })
     return video;
   } catch (error) {
-    console.log(error)
+    return error;
   }
 }
 

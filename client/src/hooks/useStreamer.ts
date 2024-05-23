@@ -126,7 +126,7 @@ const useStreamer = () => {
 
             try {
               const formData = new FormData();
-              formData.append('video', superbuffer, VideoTitle.current?.value);
+              formData.append('video', superbuffer, `${VideoTitle.current?.value}.mp4`);
               formData.append("Title", (VideoTitle.current?.value || '""'));
               formData.append("CreatedBy", JSON.parse(localStorage.getItem('UserId') || '""'))
               console.log(localStorage.getItem('UserId'));

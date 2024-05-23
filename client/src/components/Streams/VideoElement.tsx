@@ -1,25 +1,22 @@
-import React, { useEffect } from 'react'
-import useViewer from '../../hooks/useViewer'
-import Loading from '../Extra/Loading';
-import Chat from '../Video/Chat';
-import Profile from '../Profile/Profile';
+import React, { useState, useRef, useEffect } from 'react'
+import { useParams } from 'react-router-dom';
 import Recomended from '../Extra/Recomended';
+import Profile from '../Profile/Profile';
 
-const Stream: React.FC = () => {
+const VideoElement: React.FC = () => {
 
-  const { remoteVideoRef, init } = useViewer();
-
-  useEffect(() => {
-    init();
-  })
+  const videoRef=useRef<HTMLVideoElement | null>(null);
+  const params=useParams();
 
   return (
     <div className="w-[100vw] md:w-[96vw] h-auto">
       <div className="flex flex-col justify-center  py-4 xl:py-6 mx-auto bg-gray-800">
         <section className='flex flex-col justify-center gap-3 md:flex-row box-border'>
           <div className='flex flex-col justify-start md:w-[73%]'>
-            <div className="flex flex-col gap-3 justify-center w-full ">
-              <video className='w-full  h-64  md:h-46  bg-black' ref={remoteVideoRef} autoPlay controls />
+            <div className="flex flex-col gap-3 justify-center w-full" >
+              <video className='w-full h-64 md:h-46  bg-black' autoPlay controls ref={videoRef} >
+                <source src={`http://localhost:5000/api/video/${params.videoId}`} type='video/mp4'/>
+              </video>
               <div className='flex justify-between items-center  flex-wrap px-5'>
                 <h1 className='text-3xl text-white font-serif'>Lorem ipsum dolor sit amet consectetur adipisicing elit.</h1>
                 <div className='flex items-center gap-3'>
@@ -39,13 +36,11 @@ const Stream: React.FC = () => {
             <Profile />
           </div>
           <div className='w-full md:w-[24%]   '>
-            <Chat />
             <Recomended />
           </div>
         </section>
       </div>
-    </div>
-  )
+    </div>)
 }
 
-export default Stream
+export default VideoElement;

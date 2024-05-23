@@ -1,10 +1,11 @@
 import Home from "./Home/Home";
 import Footer from "./Footer/Footer";
-import Profile  from "./Profile/Profile";
+import Profile from "./Profile/Profile";
 import NavBar from "./Header/NavBar";
 import SideBar from "./Header/SideBar";
 import Video from "./Video/Video";
 import Stream from "./Streams/Stream";
+import VideoElement from "./Streams/VideoElement";
 
 export {
   Home,
@@ -14,4 +15,5 @@ export {
   Profile,
   Video,
   Stream,
+  VideoElement,
 }

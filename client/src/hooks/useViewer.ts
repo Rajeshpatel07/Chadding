@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react'
+import { useMemo, useRef} from 'react'
 import { peerConnection } from '../services/Webrtc'
 import axios from 'axios';
 import { io } from 'socket.io-client';
@@ -30,7 +30,7 @@ const useViewer = () => {
         if (roomIdInput.current) {
           socket.emit("join:viewer", {
             roomId: roomIdInput.current,
-            userId: JSON.parse(localStorage.getItem("UserId"))
+            userId: JSON.parse(localStorage.getItem("UserId") || "''")
           })
         } else {
           console.log("roomIdInput is empty")
