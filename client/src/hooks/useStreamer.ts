@@ -2,6 +2,7 @@ import { useState, useRef, useMemo } from 'react'
 import { peerConnection } from '../services/Webrtc'
 import axios from 'axios';
 import { io } from 'socket.io-client';
+import base64 from '../services/Base64';
 
 
 const useStreamer = () => {
@@ -13,6 +14,7 @@ const useStreamer = () => {
   const mediaRecorder = useRef<MediaRecorder | null>(null)
   const chunks = useRef<Array<Blob>>([]);
   const VideoTitle = useRef<HTMLInputElement | null>(null);
+  const Imageurl = useRef<string | null>(null);
 
   const getCameraPermission = async () => {
     try {
@@ -20,7 +22,6 @@ const useStreamer = () => {
       setLocalStream(stream);
       if (localVideoRef.current) {
         localVideoRef.current.srcObject = stream;
-        console.log("Stream", stream)
       } else {
         console.log("localVideoRef is undefined")
       }
@@ -52,7 +53,6 @@ const useStreamer = () => {
 
         //pushing the localstream to the peerConnection
         localStream?.getTracks().forEach(track => {
-          console.log("localStream tracks", track)
           peerConnection.peer?.addTrack(track, localStream);
         });
       }
@@ -61,7 +61,6 @@ const useStreamer = () => {
         recordMedia(localStream)
       }
       socket.connect();
-
 
     } catch (error) {
       console.log(error)
@@ -82,7 +81,9 @@ const useStreamer = () => {
       await peerConnection.setAnswer(desc)
       socket.emit("join:streamer", {
         name: JSON.parse(localStorage.getItem('Username') || '""'),
-        Id: JSON.parse(localStorage.getItem("UserId") || '""')
+        Id: JSON.parse(localStorage.getItem("UserId") || '""'),
+        Thumbnail: Imageurl.current,
+        Title: VideoTitle.current?.value
       })
 
     } catch (error) {
@@ -126,16 +127,23 @@ const useStreamer = () => {
 
             try {
               const formData = new FormData();
-              formData.append('video', superbuffer, `${VideoTitle.current?.value}.mp4`);
-              formData.append("Title", (VideoTitle.current?.value || '""'));
-              formData.append("CreatedBy", JSON.parse(localStorage.getItem('UserId') || '""'))
+              formData.append('video', superbuffer, `${VideoTitle.current?.value}.webm`); // Change 'video' to 'files'
+              if(Imageurl.current){
+                const imageBlob = base64(Imageurl.current);
+                formData.append('image',imageBlob ,`${VideoTitle.current?.value}.jpg`)
+              }
+              formData.append('Title', VideoTitle.current?.value || '');
+              formData.append('CreatedBy', JSON.parse(localStorage.getItem('UserId') || '""'));
+          
               console.log(localStorage.getItem('UserId'));
+          
               const response = await axios.post('/api/video', formData);
-              console.log("formData", formData)
-              console.log(response)
-            } catch (error) {
+              console.log('formData', formData);
+              console.log(response);
+          } catch (error) {
               console.log(error);
-            }
+          }
+          
           };
         }
       }
@@ -152,7 +160,8 @@ const useStreamer = () => {
     endStream,
     VideoTitle,
     setCheck,
-    check
+    check,
+    Imageurl
   }
 }
 

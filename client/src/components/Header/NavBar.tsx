@@ -1,25 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import NavItems from "../../Data/NavItems.json";
 import Login from "../Dialogs/Login";
 import Signup from "../Dialogs/Signup";
 import axios from "axios";
 
 const NavBar: React.FC = () => {
-  const [token, setToken] = useState<boolean>(true);
 
-  useEffect(() => {
-    (async function () {
-      try {
-        const response = await axios.get("/api/");
-        if (response.data.error) {
-          setToken(false);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    })();
-  }, []);
 
   return (
     <div className="navbar flex justify-between items-center px-8 py-4 bg-black ">
@@ -51,38 +37,7 @@ const NavBar: React.FC = () => {
       </div>
 
       <div className="flex-none items-center gap-2">
-        {
-          token ?
-
-            <>
-              <div className="  px-8 hidden md:flex items-center gap-5">
-                <div className="avatar placeholder">
-                  <div className=" text-neutral-content rounded-full w-8">
-                    <span className="text-xs">UI</span>
-                  </div>
-                </div>
-                <div className="avatar placeholder">
-                  <div className="bg-neutral text-neutral-content rounded-full w-8">
-                    <span className="text-xs">UI</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="dropdown dropdown-end">
-                <div className="avatar flex items-center gap-5">
-                  <h1 className="text-lg text-white font-bold">Mike</h1>
-                  <div className="w-10 rounded">
-                    <img src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg" />
-                  </div>
-                </div>
-              </div>
-            </>
-            :
-            <>
-              <Signup />
-              <Login />
-            </>
-        }
+        <UserStatus />
       </div>
 
     </div>
@@ -90,3 +45,62 @@ const NavBar: React.FC = () => {
 };
 
 export default NavBar;
+
+
+const UserStatus: React.FC = () => {
+  const [token, setToken] = useState<boolean>(true);
+  const [username, setUsername] = useState<String>('');
+
+  useEffect(() => {
+    (async function() {
+      try {
+        const response = await axios.get("/api/");
+        if (response.data.error) {
+          setToken(false);
+          return;
+        }
+        setUsername(JSON.parse(localStorage.getItem("Username") || "''"))
+      } catch (error) {
+        console.log(error);
+      }
+    })();
+  }, []);
+
+  return (
+    <>
+      {
+        token ?
+
+          <>
+            <div className="  px-8 hidden md:flex items-center gap-5">
+              <div className="avatar placeholder">
+                <div className=" text-neutral-content rounded-full w-8">
+                  <span className="text-xs">UI</span>
+                </div>
+              </div>
+              <div className="avatar placeholder">
+                <div className="bg-neutral text-neutral-content rounded-full w-8">
+                  <span className="text-xs">UI</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="dropdown dropdown-end">
+              <div className="avatar flex items-center gap-5">
+                <h1 className="text-lg text-white font-bold">{username}</h1>
+                <div className="w-10 rounded">
+                  <img src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg" />
+                </div>
+              </div>
+            </div>
+          </>
+          :
+          <>
+            <Signup />
+            <Login />
+          </>
+      }
+    </>
+
+  )
+}

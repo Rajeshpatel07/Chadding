@@ -45,16 +45,17 @@ io.on('connection', socket => {
         liveStreams.push({
           streamerName: data.name,
           streamerId: streamer.userId,
-          Thumbnail: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRAdYE5RslJdlJJywY4ZHhJ5oGOIz5JOybzJNnNuGJ8qR_30fB9w6F-dzMB8TtMpfHuiTI&usqp=CAU",
           socketId: socket.id,
+          Title: data.Title,
           MediaStream: streamer.MediaStream,
+          Thumbnail: data.Thumbnail,
         })
         return;
       } else {
         console.log("streamer not found");
       }
     })
-    socket.emit("me")
+    socket.emit("me",socket.id)
   })
 
   socket.on("join:viewer", (data) => {

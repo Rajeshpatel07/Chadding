@@ -6,15 +6,13 @@ import { useParams } from 'react-router-dom';
 const Profile: React.FC = () => {
   const [description, setDescription] = useState<boolean>(false);
   const params = useParams();
-  console.log(params)
 
   axios.defaults.withCredentials = true;
 
   useEffect(() => {
     (
-      async function () {
+      async function() {
         const Id: string = JSON.parse(localStorage.getItem('UserId') || '""')
-        console.log(Id)
         try {
           const response = await axios.get(`/api/profile/${Id}`,)
           console.log(response)
@@ -31,14 +29,14 @@ const Profile: React.FC = () => {
       <main className='px-2 w-screen  flex flex-col  sm:px-5'>
         <div className="p-6 sm:p-12 ">
           <div className="flex justify-between items-center">
-            <section className='flex space-x-6  space-y-4 '>
-              <img src="https://source.unsplash.com/75x75/?portrait" alt="" className="self-center flex-shrink-0 w-20 h-20 border rounded-full md:justify-self-start dark:bg-gray-500 dark:border-gray-300" />
-              <div className="flex flex-col">
-                <h4 className="text-lg font-semibold text-center md:text-left">Leroy Jenkins</h4>
-                <p>2,2523 subscribers</p>
-              </div>
+            <section className='flex items-center gap-8'>
+              <img src="https://rajesh-patel.vercel.app/Rlogo.png" alt="" className="self-center flex-shrink-0 w-12 h-12 border rounded-full" />
+                <section className='self-start'>
+                  <h1 className='text-md text-white font-medium'>{params.username}</h1>
+                  <p>22,123 Subscribers</p>
+                </section>
             </section>
-            <button className='text-xl text-white font-bold px-5 py-2 bg-violet-600 rounded'>Subscribe</button>
+            <button className='text-md text-white px-5 py-2 font-medium bg-violet-600 rounded'>Subscribe</button>
           </div>
         </div>
       </main>

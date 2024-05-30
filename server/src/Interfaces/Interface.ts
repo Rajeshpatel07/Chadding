@@ -20,4 +20,5 @@ export interface liveStreamsInterface {
   Thumbnail: string;
   socketId: string;
   MediaStream: MediaStream;
+  Title: string;
 }

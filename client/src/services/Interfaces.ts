@@ -3,6 +3,7 @@ export interface liveStreamsInterface {
   streamerId: string;
   Thumbnail: string;
   socketId: string;
+  Title:string;
   MediaStream: MediaStream;
 }
 

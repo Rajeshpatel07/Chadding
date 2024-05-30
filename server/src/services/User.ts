@@ -1,6 +1,7 @@
 import { Request } from "express";
 import { prisma } from "../index.js";
 import { User, userUpdate } from "../Interfaces/DBInterfaces.js";
+import { Videos } from "./Video.js";
 
 
 export const CreateUser = async (Username: string, Email: string, Password: string, ProfileImage: string) => {
@@ -24,14 +25,22 @@ export const findSingleUser = async (Email: string) => {
 }
 
 export const getSingleUser = async (Id: string) => {
-  const user: User = await prisma.user.findFirst({
+  const user = await prisma.user.findFirst({
     where: {
       Id: Id
+    },
+    select: {
+      Id: true,
+      Username: true,
+      ProfileImage: true,
+      Role: true,
+      videos: true
     }
-  }) as User;
+  });
 
   return user;
 }
+
 
 
 export const updateUser = async (body: userUpdate, file: Request) => {

@@ -1,16 +1,17 @@
 import { prisma } from "../index.js";
-import { VideoInterface, VideoData } from "Interfaces/DBInterfaces";
+import { VideoData } from "Interfaces/DBInterfaces";
 
 
 
 // TODO
-export const addVideo = async (Title: string, VideoPath: string, creatorId: string) => {
+export const addVideo = async (Title: string, videoPath: string,imagePath: string, creatorId: string) => {
   try {
     const newVideo = await prisma.video.create({
       data: {
         Title: Title,
         CreatedBy: creatorId,
-        videoPath: VideoPath,
+        videoPath: videoPath,
+        Thumbnail:imagePath
       } as VideoData,
     });
     return newVideo;
@@ -26,6 +27,16 @@ export const getSingleVideo = async (Id: string) => {
       where: {
         Id
       },
+      include:{
+        Creator:{
+          select: {
+            Id: true,
+            Username: true,
+            Email: true,
+            ProfileImage: true
+          },
+        }
+      }
     })
     return video;
   } catch (error) {
@@ -50,7 +61,18 @@ export const UserVideos = async (Id: string) => {
 
 export const Videos = async () => {
   try {
-    const videos = await prisma.video.findMany({})
+    const videos = await prisma.video.findMany({
+      include:{
+        Creator:{
+          select: {
+            Id: true,
+            Username: true,
+            Email: true,
+            ProfileImage: true
+          },
+        }
+      }
+    })
     return videos;
 
   } catch (error) {
