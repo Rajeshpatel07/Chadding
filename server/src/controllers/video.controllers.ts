@@ -35,19 +35,27 @@ export let liveStreams: Array<liveStreamsInterface> = [];
 export const AddVideo = async (req: Request, res: Response) => {
   const { Title, CreatedBy } = req.body;
 
-  if (!Title || !CreatedBy || !req.file) {
-    return res.sendStatus(403).json({ msg: "All files are mandatory" });
+  if (!Title || !CreatedBy || !req.files) {
+    return res.status(403).json({ msg: "All fields are mandatory" });
   }
 
+  const files = req.files as { [fieldname: string]: Express.Multer.File[] };
 
   try {
-    // Assuming Multer extracts the path to req.file.path
-    const videoPath = req.file?.filename;
-    const newVideo = await addVideo(Title, videoPath, CreatedBy);
+    const videoFile = files.video?.[0].filename;
+    const imageFile = files.image?.[0].filename;
+
+    if (!videoFile || !imageFile) {
+      return res.status(403).json({ msg: "Both video and image files are required" });
+    }
+
+    const newVideo = await addVideo(Title, videoFile,imageFile, CreatedBy);
     return res.json(newVideo);
+
+    // res.json({ message: 'Files uploaded successfully', videoPath, imagePath });
   } catch (error) {
     console.log(error);
-    res.json({ error: error });
+    res.status(500).json({ error: error });
   }
 };
 
@@ -57,9 +65,9 @@ export const GetVideo = async (req: Request, res: Response) => {
   if (!Id) return res.json({ msg: "Invalid video Id" })
 
   try {
-    const dbvideo:VideoInterface = await getSingleVideo(Id);
+    const dbvideo: VideoInterface = await getSingleVideo(Id);
     const video = {
-      videoPath: path.join(import.meta.dirname, '../../Storage', dbvideo.videoPath)
+      videoPath: path.join(import.meta.dirname, '../../Storage/Videos', dbvideo.videoPath)
     };
 
     //   console.log('Resolved video path:', video.videoPath);
@@ -90,15 +98,16 @@ export const GetVideo = async (req: Request, res: Response) => {
         'Content-Range': `bytes ${start}-${end}/${fileSize}`,
         'Accept-Ranges': 'bytes',
         'Content-Length': chunkSize,
-        'Content-Type': 'video/mp4',
+        'Content-Type': 'video/webm',
       };
 
       res.writeHead(206, head);
       file.pipe(res);
     } else {
+      console.log("no range")
       const head = {
         'Content-Length': fileSize,
-        'Content-Type': 'video/mp4',
+        'Content-Type': 'video/webm',
       };
       res.writeHead(200, head);
       fs.createReadStream(video.videoPath).pipe(res);
@@ -145,8 +154,9 @@ export const viewer = async (req: Request, res: Response) => {
     const peer = new webrtc.RTCPeerConnection(Servers);
     const desc = new webrtc.RTCSessionDescription(body.sdp);
     await peer.setRemoteDescription(desc);
+    let singleStreamer: liveStreamsInterface | undefined;
     if (liveStreams) {
-      const singleStreamer = liveStreams.find((stream) => {
+      singleStreamer = liveStreams.find((stream) => {
         return stream.socketId == body.roomId
       })
       singleStreamer?.MediaStream.getTracks().forEach(track => peer.addTrack(track, singleStreamer?.MediaStream));
@@ -154,7 +164,9 @@ export const viewer = async (req: Request, res: Response) => {
     const answer = await peer.createAnswer();
     await peer.setLocalDescription(answer);
     const payload = {
-      sdp: peer.localDescription
+      sdp: peer.localDescription,
+      Title: singleStreamer?.Title || '',
+      Streamername: singleStreamer?.streamerName || '',
     }
 
     res.json(payload);
@@ -168,6 +180,7 @@ export const getLiveStreams = async (req: Request, res: Response) => {
   if (liveStreams.length < 0) {
     return res.json({ msg: "No live streams found" });
   }
+  // console.log(liveStreams)
   try {
     const videos = await Videos();
     return res.json({ liveStreams, videos });
@@ -178,7 +191,7 @@ export const getLiveStreams = async (req: Request, res: Response) => {
 
 export const endStream = (req: Request, res: Response) => {
   const { CreatedBy } = req.body;
-  console.log("request to stop Stream", liveStreams);
+  // console.log("request to stop Stream", liveStreams)
   liveStreams = liveStreams.filter(stream => {
     stream.streamerId != CreatedBy;
   })

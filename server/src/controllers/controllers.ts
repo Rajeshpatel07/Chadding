@@ -53,12 +53,8 @@ const Profile = async (req: Request, res: Response) => {
 
   try {
     const user = await getSingleUser(Id);
-    const videos = await UserVideos(Id);
-    delete user.Password;
-    delete user.Email;
     return res.status(200).json({
-      User: user,
-      videos: videos
+      User: user
     });
   } catch (error) {
     console.log(error);

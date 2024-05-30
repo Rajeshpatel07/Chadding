@@ -30,7 +30,7 @@ const Icons: React.FC = () => {
           <li className="rounded-sm" key={item.Title}>
             <Link to={item.route} className="flex items-center p-2 space-x-3 rounded-md">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox={item.ViewBox} className="w-5 h-5 fill-current text-gray-400 dark:text-gray-600">
-                <path d={item.Path}></path>
+                <path d={item.Path} className='text-white'></path>
               </svg>
             </Link>
           </li>

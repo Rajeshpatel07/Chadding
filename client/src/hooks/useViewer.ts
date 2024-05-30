@@ -1,16 +1,18 @@
-import { useMemo, useRef} from 'react'
+import { useMemo, useRef, useEffect, useState } from 'react'
 import { peerConnection } from '../services/Webrtc'
 import axios from 'axios';
 import { io } from 'socket.io-client';
-import { useParams } from 'react-router-dom';
+import { useAsyncError, useParams } from 'react-router-dom';
 
 
 const useViewer = () => {
   const socket = useMemo(() => io('http://localhost:5000', { autoConnect: false }), []);
   const remoteVideoRef = useRef<HTMLVideoElement | null>(null);
   const roomIdInput = useRef<string | null>(null);
+const [title,setTitle]=useState<string>('');
+const [streamer,setStreamer]=useState<string>('');
   const params = useParams();
-  console.log("Params from useViewer", params)
+
 
   const init = async () => {
     try {
@@ -22,8 +24,8 @@ const useViewer = () => {
 
         peerConnection.peer.ontrack = (event) => {
           console.log(event.streams[0])
-          if(remoteVideoRef.current){
-          remoteVideoRef.current.srcObject = event.streams[0];
+          if (remoteVideoRef.current) {
+            remoteVideoRef.current.srcObject = event.streams[0];
           }
         };
 
@@ -56,6 +58,8 @@ const useViewer = () => {
 
       const { data } = await axios.post('/api/viewer', payload);
       console.log(data)
+      setTitle(data.Title);
+      setStreamer(data.Streamer)
       const desc = new RTCSessionDescription(data.sdp);
       await peerConnection.setAnswer(desc)
 
@@ -68,6 +72,8 @@ const useViewer = () => {
   return {
     remoteVideoRef,
     init,
+    title,
+    streamer
 
   }
 }

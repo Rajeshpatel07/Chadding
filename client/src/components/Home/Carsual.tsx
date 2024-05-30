@@ -7,16 +7,16 @@ import { LazyLoadImage } from 'react-lazy-load-image-component';
 
 interface props {
   link: string;
-  Stream: Array<liveStreamsInterface>;
+  Stream: Array<T>;
 }
 
 const Carsual: React.FC<props> = ({ link, Stream }) => {
 
-
+// console.log(Stream)
   return (
     <>
       {
-        Stream ?
+        Stream.length >= 1 ?
           <div className='py-8 flex flex-col justify-center gap-2 '>
             <div className='flex justify-between items-center px-8'>
               <h1 className='text-2xl text-white font-serif'>
@@ -26,23 +26,31 @@ const Carsual: React.FC<props> = ({ link, Stream }) => {
             </div>
             <div className=' flex justify-center'>
               <div className="carousel gap-2 w-[94vw] py-10 pl-4">
-                {Games.map((item) => (
+                {Stream.map((item) => (
                   <motion.div
-                    key={item.id}
+                    key={item.socketId || item.Id}
                     className='carousel-item py-2 px-1 w-52 h-44 flex flex-col gap-5 rounded-xl'
                     whileHover={{
                       scale: 1.05,
                       y: -10
                     }}
                   >
-                    <Link to={`/${item.streamer_name}/${item.id}`}>
-                      <LazyLoadImage src={item.image} alt={item.title} className='rounded-md' />
-                    </Link>
+                    {
+                      item.socketId ?
+                        <Link to={`/${item.streamerName || item.Creator.Username}/l/${item.socketId || item.Id}`}>
+                          <LazyLoadImage src={item.Thumbnail || 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRAdYE5RslJdlJJywY4ZHhJ5oGOIz5JOybzJNnNuGJ8qR_30fB9w6F-dzMB8TtMpfHuiTI&usqp=CAU'} alt={item.streamerId} className='rounded-md' />
+                        </Link>
+                        :
+                        <Link to={`/${item.streamerName || item.Creator.Username}/w/${item.socketId || item.Id}`}>
+                          <LazyLoadImage src={item.Thumbnail || 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRAdYE5RslJdlJJywY4ZHhJ5oGOIz5JOybzJNnNuGJ8qR_30fB9w6F-dzMB8TtMpfHuiTI&usqp=CAU'} alt={item.streamerId} className='rounded-md' />
+                        </Link>
+                    }
+
                     <div className=' flex flex-col justify-center px-2 gap-2'>
-                      <h1 className='text-md text-white'>{item.title}</h1>
+                      <h1 className='text-md text-white'>{item.Title}</h1>
                       <section className='flex items-center gap-3'>
-                        <div className='bg-red-500 p-4 rounded-full w-4 h-4' style={{ backgroundImage: `url(${item.image})` }}></div>
-                        <Link to={item.streamer_name}>{item.streamer_name}</Link>
+                        <div className='bg-red-500 p-4 rounded-full w-4 h-4' style={{ backgroundImage: `url(${item.Thumbnail})` }}></div>
+                        <Link to={item.streamerId || item.Creator.Username}>{item.streamerName || item.Creator.Username}</Link>
                       </section>
                     </div>
                   </motion.div>

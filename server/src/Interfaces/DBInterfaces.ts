@@ -28,5 +28,6 @@ export interface VideoData {
   Title: string;
   CreatedBy: string;
   videoPath: string;
+  Thumbnail:string;
 }
 

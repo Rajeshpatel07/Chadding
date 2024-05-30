@@ -1,13 +1,12 @@
 import React, { useEffect } from 'react'
 import useViewer from '../../hooks/useViewer'
-import Loading from '../Extra/Loading';
 import Chat from '../Video/Chat';
 import Profile from '../Profile/Profile';
 import Recomended from '../Extra/Recomended';
 
 const Stream: React.FC = () => {
 
-  const { remoteVideoRef, init } = useViewer();
+  const { remoteVideoRef, init, title, streamer } = useViewer();
 
   useEffect(() => {
     init();
@@ -21,7 +20,7 @@ const Stream: React.FC = () => {
             <div className="flex flex-col gap-3 justify-center w-full ">
               <video className='w-full  h-64  md:h-46  bg-black' ref={remoteVideoRef} autoPlay controls />
               <div className='flex justify-between items-center  flex-wrap px-5'>
-                <h1 className='text-3xl text-white font-serif'>Lorem ipsum dolor sit amet consectetur adipisicing elit.</h1>
+                <h1 className='text-3xl text-white font-serif'>{title}</h1>
                 <div className='flex items-center gap-3'>
                   <button className='p-2 bg-gray-700 rounded-full border  flex items-center justify-center'>
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
@@ -36,7 +35,7 @@ const Stream: React.FC = () => {
                 </div>
               </div>
             </div>
-            <Profile />
+            <Profile name={streamer} />
           </div>
           <div className='w-full md:w-[24%]   '>
             <Chat />
