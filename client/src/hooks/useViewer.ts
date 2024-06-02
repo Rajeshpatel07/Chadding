@@ -1,24 +1,24 @@
-import { useMemo, useRef, useEffect, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { peerConnection } from '../services/Webrtc'
 import axios from 'axios';
 import { io } from 'socket.io-client';
-import { useAsyncError, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 
 const useViewer = () => {
   const socket = useMemo(() => io('http://localhost:5000', { autoConnect: false }), []);
   const remoteVideoRef = useRef<HTMLVideoElement | null>(null);
-  const roomIdInput = useRef<string | null>(null);
-const [title,setTitle]=useState<string>('');
-const [streamer,setStreamer]=useState<string>('');
+  const [title, setTitle] = useState<string>('');
+  const [streamer, setStreamer] = useState<string>('');
   const params = useParams();
 
 
   const init = async () => {
     try {
       if (peerConnection.peer) {
-        roomIdInput.current = params.streamId;
+
         peerConnection.peer.addTransceiver("video", { direction: "recvonly" });
+        peerConnection.peer.addTransceiver("audio", { direction: "recvonly" });
 
         peerConnection.peer.onnegotiationneeded = handleNegotiationNeededEvent;
 
@@ -29,13 +29,13 @@ const [streamer,setStreamer]=useState<string>('');
           }
         };
 
-        if (roomIdInput.current) {
+        if (params) {
           socket.emit("join:viewer", {
-            roomId: roomIdInput.current,
+            roomId: params.streamId,
             userId: JSON.parse(localStorage.getItem("UserId") || "''")
           })
         } else {
-          console.log("roomIdInput is empty")
+          console.log("roomId is empty")
         }
 
       } else {
@@ -46,23 +46,20 @@ const [streamer,setStreamer]=useState<string>('');
     }
   };
 
-
   const handleNegotiationNeededEvent = async () => {
     try {
 
       const offer = await peerConnection.createOffer();
       const payload = {
         sdp: offer,
-        roomId: roomIdInput.current
+        roomId: params.streamId
       };
-
       const { data } = await axios.post('/api/viewer', payload);
       console.log(data)
       setTitle(data.Title);
       setStreamer(data.Streamer)
       const desc = new RTCSessionDescription(data.sdp);
       await peerConnection.setAnswer(desc)
-
 
     } catch (error) {
       console.log(error)

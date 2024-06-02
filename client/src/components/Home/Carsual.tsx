@@ -1,8 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import Games from '../../Data/Games.json';
+import React from 'react';
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom';
-import { liveStreamsInterface } from '../../services/Interfaces';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 
 interface props {
