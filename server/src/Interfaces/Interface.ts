@@ -10,7 +10,7 @@ export interface ViewerId {
 
 export interface streamerStreams {
   userId: string;
-  MediaStream: MediaStream;
+  MediaStream: Array<MediaStream>;
   socketId?: string;
 }
 

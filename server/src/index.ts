@@ -22,7 +22,12 @@ export const io = new Server(server, {
 });
 export const prisma = new PrismaClient();
 
-app.use(cors());
+app.use(cors({
+  origin: ['http://localhost:5173', 'http://localhost:3000'], // Allow requests from these origins
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allow these HTTP methods
+  allowedHeaders: ['Content-Type', 'Authorization'], // Allow these headers
+  credentials: true // Include credentials in the response
+}));
 app.use(express.json());
 app.use(cookieParser())
 app.use(bodyParser.urlencoded({ extended: true }))
@@ -55,7 +60,7 @@ io.on('connection', socket => {
         console.log("streamer not found");
       }
     })
-    socket.emit("me",socket.id)
+    socket.emit("me", socket.id)
   })
 
   socket.on("join:viewer", (data) => {

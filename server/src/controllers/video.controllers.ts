@@ -1,7 +1,7 @@
 import { Response, Request } from "express";
 import { VideoInterface } from "../Interfaces/DBInterfaces.js";
 import { addVideo, getSingleVideo, Videos } from "../services/Video.js"
-import webrtc from 'wrtc';
+import webrtc, { MediaStream } from 'wrtc';
 import { liveStreamsInterface, StreamerId, streamerStreams } from "Interfaces/Interface.js";
 import fs from 'fs'
 import path from "path";
@@ -49,7 +49,7 @@ export const AddVideo = async (req: Request, res: Response) => {
       return res.status(403).json({ msg: "Both video and image files are required" });
     }
 
-    const newVideo = await addVideo(Title, videoFile,imageFile, CreatedBy);
+    const newVideo = await addVideo(Title, videoFile, imageFile, CreatedBy);
     return res.json(newVideo);
 
     // res.json({ message: 'Files uploaded successfully', videoPath, imagePath });
@@ -67,7 +67,7 @@ export const GetVideo = async (req: Request, res: Response) => {
   try {
     const dbvideo: VideoInterface = await getSingleVideo(Id);
     const video = {
-      videoPath: path.join(import.meta.dirname, '../../Storage/Videos', dbvideo.videoPath)
+      videoPath: path.join(import.meta.dirname, '../../Storage/Videos/', dbvideo.videoPath)
     };
 
     //   console.log('Resolved video path:', video.videoPath);
@@ -76,6 +76,7 @@ export const GetVideo = async (req: Request, res: Response) => {
     if (!video) {
       return res.status(404).send('Video not found');
     }
+
 
     const stat = fs.statSync(video.videoPath);
     const fileSize = stat.size;
@@ -124,7 +125,16 @@ export const broadcast = async (req: Request, res: Response) => {
   try {
 
     const peer = new webrtc.RTCPeerConnection(Servers);
-    peer.ontrack = (e: RTCTrackEvent) => handleTrackEvent(e, req);
+
+    let streams: Array<MediaStream> = [];
+    peer.ontrack = (e: RTCTrackEvent) => {
+      streams.push(e.streams[0]);
+    }
+    console.log("streams", streams);
+    senderStream.push({
+      userId: req.body.userId,
+      MediaStream: streams
+    })
     const desc = new webrtc.RTCSessionDescription(body.sdp);
     await peer.setRemoteDescription(desc);
     const answer = await peer.createAnswer();
@@ -140,9 +150,12 @@ export const broadcast = async (req: Request, res: Response) => {
 }
 
 function handleTrackEvent(e: RTCTrackEvent, req: Request) {
+  const streams = [];
+  streams.push(e.streams[0]);
+  console.log("streams", streams)
   senderStream.push({
     userId: req.body.userId,
-    MediaStream: e.streams[0]
+    MediaStream: streams
   })
   //   console.log(senderStream)
 };
@@ -155,12 +168,23 @@ export const viewer = async (req: Request, res: Response) => {
     const desc = new webrtc.RTCSessionDescription(body.sdp);
     await peer.setRemoteDescription(desc);
     let singleStreamer: liveStreamsInterface | undefined;
+
     if (liveStreams) {
       singleStreamer = liveStreams.find((stream) => {
-        return stream.socketId == body.roomId
-      })
-      singleStreamer?.MediaStream.getTracks().forEach(track => peer.addTrack(track, singleStreamer?.MediaStream));
+        return stream.socketId == body.roomId;
+      });
+
+      // console.log("singleStreamer", singleStreamer);
+
+      const combinedStream: MediaStream = new MediaStream([...singleStreamer?.MediaStream[0].getTracks(), ...singleStreamer?.MediaStream[1].getTracks()]);
+      console.log("combinedStream", combinedStream)
+
+      combinedStream.getTracks().forEach((track: RTCTrackEvent) => {
+        peer.addTrack(track, combinedStream);
+      });
+
     }
+
     const answer = await peer.createAnswer();
     await peer.setLocalDescription(answer);
     const payload = {

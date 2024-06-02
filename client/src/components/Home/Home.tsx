@@ -1,12 +1,17 @@
 import React, { lazy, Suspense, useEffect, useState } from 'react';
 const Carsual = lazy(() => import('./Carsual'))
-import { liveStreamsInterface } from '../../services/Interfaces';
 import axios from 'axios';
 import Loading from '../Extra/Loading';
 import { Link } from 'react-router-dom';
+import { liveStreamsInterface } from '../../services/Interfaces';
+
+interface Streams {
+  liveStreams: Array<liveStreamsInterface>;
+  videos: Array<liveStreamsInterface>;
+}
 
 const Home: React.FC = () => {
-  const [stream, setStream] = useState<Array<T>>([])
+  const [stream, setStream] = useState<Streams | null>(null)
 
   useEffect(() => {
     (async function() {
@@ -21,9 +26,9 @@ const Home: React.FC = () => {
   }, [])
   // console.log("liveStream", liveStream);
 
-  if (stream.length == 0) return <Loading />
+  if (stream == null) return <Loading />
 
-  console.log("Streams",stream)
+  console.log("Streams", stream)
   return (
     <div className="md:w-[98vw]">
       <div className="flex  flex-col justify-center py-6 xl:p-8 mx-auto  lg:flex-row lg:justify-between bg-gray-800">
@@ -39,9 +44,9 @@ const Home: React.FC = () => {
           <video src="" className='border  w-full h-full rounded-xl'></video>
         </Link>
       </div>
-      <Suspense fallback={<Loading/>}>
-      <Carsual link="Top" Stream={stream.liveStreams} />
-      <Carsual link="Recommended" Stream={stream.videos} />
+      <Suspense fallback={<Loading />}>
+        <Carsual link="Top" Stream={stream.liveStreams} />
+        <Carsual link="Recommended" Stream={stream.videos} />
       </Suspense>
     </div>
   )

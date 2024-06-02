@@ -13,6 +13,7 @@ export interface VideoInterface {
   Title: string;
   Creator: string;
   videoPath: string;
+  Thumbnail:string;
   createdAt: Date;
   updatedAt: Date;
 }
