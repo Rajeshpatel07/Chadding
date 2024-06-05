@@ -3,8 +3,19 @@ export interface liveStreamsInterface {
   streamerId: string;
   Thumbnail: string;
   socketId: string;
-  Title:string;
+  Title: string;
   MediaStream: MediaStream;
+}
+
+export interface offlineStreamInterface {
+  CreatorBy: string;
+  Id: string;
+  Title: string;
+  Thumbnail: string;
+  createdAt: Date;
+  updatedAt: Date;
+  videoPath: string;
+
 }
 
 interface IceServer {
@@ -17,8 +28,8 @@ export interface Configuration {
   iceServers: IceServer[];
 }
 
-export interface fileInput{
-  target:{
-    files:Array<File>;
+export interface fileInput {
+  target: {
+    files: Array<File>;
   };
 }

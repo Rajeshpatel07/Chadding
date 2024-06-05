@@ -1,6 +1,6 @@
 import React from 'react'
 
-const StreamInfo = () => {
+const StreamInfo: React.FC = () => {
   return (
     <div>StreamInfo</div>
   )

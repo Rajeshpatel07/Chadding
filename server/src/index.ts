@@ -6,7 +6,7 @@ import { Server } from "socket.io";
 import cors from 'cors'
 import cookieParser from 'cookie-parser';
 import bodyParser from "body-parser";
-import { liveStreams, senderStream } from "./controllers/video.controllers.js";
+import { liveStreams } from "./controllers/video.controllers.js";
 
 //This is only for performance purpose remove it after the testing.
 import status from 'express-status-monitor'
@@ -43,18 +43,11 @@ app.use(status());
 io.on('connection', socket => {
 
   socket.on("join:streamer", (data) => {
+    console.log("Socket Id", socket.id);
     socket.join(socket.id);
-    senderStream.map((streamer) => {
-      if (streamer.userId == data.Id) {
+    liveStreams.map((streamer) => {
+      if (streamer.Id == data.Id) {
         streamer.socketId = socket.id;
-        liveStreams.push({
-          streamerName: data.name,
-          streamerId: streamer.userId,
-          socketId: socket.id,
-          Title: data.Title,
-          MediaStream: streamer.MediaStream,
-          Thumbnail: data.Thumbnail,
-        })
         return;
       } else {
         console.log("streamer not found");
@@ -72,6 +65,7 @@ io.on('connection', socket => {
   })
 
   socket.on("disconnection", () => {
+    socket.disconnect();
     console.log("Connection Closed")
   })
 

@@ -11,14 +11,15 @@ export interface ViewerId {
 export interface streamerStreams {
   userId: string;
   MediaStream: Array<MediaStream>;
-  socketId?: string;
+  peer: RTCPeerConnection;
 }
 
 export interface liveStreamsInterface {
-  streamerName: string;
-  streamerId: string;
-  Thumbnail: string;
-  socketId: string;
-  MediaStream: MediaStream;
+  Id: string;
   Title: string;
+  username: string;
+  Thumbnail: string;
+  socketId?: string;
+  MediaStream: Array<MediaStream>;
+  peer: RTCPeerConnection;
 }

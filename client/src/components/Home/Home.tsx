@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 import { liveStreamsInterface } from '../../services/Interfaces';
 
 interface Streams {
-  liveStreams: Array<liveStreamsInterface>;
+  LiveStreams: Array<liveStreamsInterface>;
   videos: Array<liveStreamsInterface>;
 }
 
@@ -17,14 +17,16 @@ const Home: React.FC = () => {
     (async function() {
       try {
         const response = await axios.get("/api/livestreams");
-        // console.log(response);
         setStream(response.data);
       } catch (error) {
         console.log(error)
       }
     })()
+
+    return () => {
+      console.log("Unmounted");
+    }
   }, [])
-  // console.log("liveStream", liveStream);
 
   if (stream == null) return <Loading />
 
@@ -40,12 +42,12 @@ const Home: React.FC = () => {
             <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quam, natus.</p>
           </div>
         </div>
-        <Link to={`/mike@124/watch/44b35123-9f8e-41d0-bebe-185a4b97f2ce`} className="flex items-center justify-center aspect-video p-6 mt-8 lg:mt-0  sm:h-80 lg:h-96 xl:h-105 2xl:h-112 rounded-xl">
+        <Link to={`#`} className="flex items-center justify-center aspect-video p-6 mt-8 lg:mt-0  sm:h-80 lg:h-96 xl:h-105 2xl:h-112 rounded-xl">
           <video src="" className='border  w-full h-full rounded-xl'></video>
         </Link>
       </div>
       <Suspense fallback={<Loading />}>
-        <Carsual link="Top" Stream={stream.liveStreams} />
+        <Carsual link="Top" Stream={stream.LiveStreams} />
         <Carsual link="Recommended" Stream={stream.videos} />
       </Suspense>
     </div>

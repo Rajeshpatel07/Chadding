@@ -26,11 +26,11 @@ const useStreamer = () => {
       } else {
         console.log("localVideoRef is undefined")
       }
-
     } catch (error) {
       console.error(error);
     }
   };
+
 
 
   const getDisplayPermission = async () => {
@@ -62,7 +62,15 @@ const useStreamer = () => {
       if (localStream && check) {
         recordMedia(localStream)
       }
-      socket.connect();
+      try {
+        await socket.connect();
+        socket.emit("join:streamer", {
+          Id: JSON.parse(localStorage.getItem("UserId") || '""'),
+        })
+      } catch (socketError) {
+        console.error("Error connecting to socket:", socketError);
+        // Handle socket connection error
+      }
 
     } catch (error) {
       console.log(error)
@@ -75,18 +83,15 @@ const useStreamer = () => {
       await peerConnection.createOffer();
       const payload = {
         sdp: peerConnection.peer?.localDescription,
-        userId: JSON.parse(localStorage.getItem('UserId') || '""')
+        Id: JSON.parse(localStorage.getItem('UserId') || '""'),
+        username: JSON.parse(localStorage.getItem('Username') || '""'),
+        thumbnail: Imageurl.current,
+        title: VideoTitle.current?.value
       };
 
       const { data } = await axios.post('/api/broadcast', payload);
       const desc = new RTCSessionDescription(data.sdp);
       await peerConnection.setAnswer(desc)
-      socket.emit("join:streamer", {
-        name: JSON.parse(localStorage.getItem('Username') || '""'),
-        Id: JSON.parse(localStorage.getItem("UserId") || '""'),
-        Thumbnail: Imageurl.current,
-        Title: VideoTitle.current?.value
-      })
 
     } catch (error) {
       console.log(error)
@@ -98,13 +103,15 @@ const useStreamer = () => {
       localStream.getTracks().forEach(track => {
         track.stop();
       })
+      peerConnection.peer?.close();
       if (check) {
         mediaRecorder.current?.stop();
       }
-      peerConnection.peer?.close();
+      socket.emit("disconnection");
+      socket.disconnect();
       try {
         const response = await axios.post("/api/stopstream", {
-          CreatedBy: JSON.parse(localStorage.getItem("UserId") || '""')
+          Id: JSON.parse(localStorage.getItem("UserId") || '""')
         })
         console.log(response);
       } catch (error) {
@@ -135,22 +142,17 @@ const useStreamer = () => {
                 formData.append('image', imageBlob, `${VideoTitle.current?.value}.jpg`)
               }
               formData.append('Title', VideoTitle.current?.value || '');
-              formData.append('CreatedBy', JSON.parse(localStorage.getItem('UserId') || '""'));
-
-              console.log(localStorage.getItem('UserId'));
-
+              formData.append('Id', JSON.parse(localStorage.getItem('UserId') || '""'));
               const response = await axios.post('/api/video', formData);
               console.log('formData', formData);
               console.log(response);
             } catch (error) {
               console.log(error);
             }
-
           };
         }
       }
     };
-
     mediaRecorder.current.start()
   }
 
