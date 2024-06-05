@@ -1,4 +1,4 @@
-import React, { useState, useEffect, FormEvent, ChangeEvent } from 'react'
+import React, { memo, useState, useEffect, FormEvent, ChangeEvent } from 'react'
 import useStreamer from '../../hooks/useStreamer';
 
 const Video: React.FC = () => {
@@ -87,4 +87,4 @@ const Video: React.FC = () => {
   )
 }
 
-export default Video;
+export default memo(Video);

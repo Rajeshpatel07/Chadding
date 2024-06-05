@@ -4,10 +4,6 @@ import axios from 'axios';
 
 axios.defaults.withCredentials = true;
 
-interface button {
-  text: string;
-}
-
 const Login: React.FC = () => {
 
   const [email, setEmail] = useState<string>("")

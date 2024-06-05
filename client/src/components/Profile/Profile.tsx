@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
 
 
 const Profile: React.FC = () => {
-  const [description, setDescription] = useState<boolean>(false);
   const params = useParams();
 
   axios.defaults.withCredentials = true;
@@ -31,10 +30,10 @@ const Profile: React.FC = () => {
           <div className="flex justify-between items-center">
             <section className='flex items-center gap-8'>
               <img src="https://rajesh-patel.vercel.app/Rlogo.png" alt="" className="self-center flex-shrink-0 w-12 h-12 border rounded-full" />
-                <section className='self-start'>
-                  <h1 className='text-md text-white font-medium'>{params.username}</h1>
-                  <p>22,123 Subscribers</p>
-                </section>
+              <section className='self-start'>
+                <h1 className='text-md text-white font-medium'>{params.username}</h1>
+                <p>22,123 Subscribers</p>
+              </section>
             </section>
             <button className='text-md text-white px-5 py-2 font-medium bg-violet-600 rounded'>Subscribe</button>
           </div>

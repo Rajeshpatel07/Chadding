@@ -1,11 +1,11 @@
-import React, { useRef } from 'react'
+import React from 'react'
 import { useParams } from 'react-router-dom';
 import Recomended from '../Extra/Recomended';
 import Profile from '../Profile/Profile';
+import ReactPlayer from 'react-player';
 
 const VideoElement: React.FC = () => {
 
-  const videoRef = useRef<HTMLVideoElement | null>(null);
   const params = useParams();
 
   return (
@@ -13,10 +13,11 @@ const VideoElement: React.FC = () => {
       <div className="flex flex-col justify-center  py-4 xl:py-6 mx-auto bg-gray-800">
         <section className='flex flex-col justify-center gap-3 lg:flex-row box-border'>
           <div className='flex flex-col justify-start lg:w-[73%]'>
-            <div className="flex flex-col gap-3 justify-center w-full" >
-              <video className='w-full h-full bg-black' autoPlay controls ref={videoRef} >
+            <div className="flex flex-col gap-3 justify-center w-inherit" >
+              <ReactPlayer width="100%" height="100%" playing={true} controls url={`http://localhost:5000/api/video/${params.videoId}`} type='video/mp4' />
+              {/* <video className='w-full h-full bg-black' autoPlay controls ref={videoRef}  >
                 <source src={`http://localhost:5000/api/video/${params.videoId}`} type='video/mp4' />
-              </video>
+              </video> */}
               <div className='flex justify-between items-center  flex-wrap px-5'>
                 <h1 className='text-3xl text-white font-serif'>Lorem ipsum dolor sit amet consectetur adipisicing elit.</h1>
                 <div className='flex items-center gap-3'>

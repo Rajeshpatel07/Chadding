@@ -10,7 +10,7 @@ interface props {
 
 const Carsual: React.FC<props> = ({ link, Stream }) => {
 
-// console.log(Stream)
+  // console.log(Stream)
   return (
     <>
       {
@@ -35,12 +35,12 @@ const Carsual: React.FC<props> = ({ link, Stream }) => {
                   >
                     {
                       item.socketId ?
-                        <Link to={`/${item.streamerName || item.Creator.Username}/l/${item.socketId || item.Id}`}>
-                          <LazyLoadImage src={item.Thumbnail || 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRAdYE5RslJdlJJywY4ZHhJ5oGOIz5JOybzJNnNuGJ8qR_30fB9w6F-dzMB8TtMpfHuiTI&usqp=CAU'} alt={item.streamerId} className='rounded-md' />
+                        <Link to={`/${item.username || item.Creator.Username}/l/${item.socketId || item.Id}`}>
+                          <LazyLoadImage src={item.Thumbnail || 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRAdYE5RslJdlJJywY4ZHhJ5oGOIz5JOybzJNnNuGJ8qR_30fB9w6F-dzMB8TtMpfHuiTI&usqp=CAU'} alt={item.Id} className='rounded-md' />
                         </Link>
                         :
-                        <Link to={`/${item.streamerName || item.Creator.Username}/w/${item.socketId || item.Id}`}>
-                          <LazyLoadImage src={item.Thumbnail || 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRAdYE5RslJdlJJywY4ZHhJ5oGOIz5JOybzJNnNuGJ8qR_30fB9w6F-dzMB8TtMpfHuiTI&usqp=CAU'} alt={item.streamerId} className='rounded-md' />
+                        <Link to={`/${item.username || item.Creator.Username}/w/${item.socketId || item.Id}`}>
+                          <LazyLoadImage src={item.Thumbnail || 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRAdYE5RslJdlJJywY4ZHhJ5oGOIz5JOybzJNnNuGJ8qR_30fB9w6F-dzMB8TtMpfHuiTI&usqp=CAU'} alt={item.Id} className='rounded-md' />
                         </Link>
                     }
 
@@ -48,7 +48,7 @@ const Carsual: React.FC<props> = ({ link, Stream }) => {
                       <h1 className='text-md text-white'>{item.Title}</h1>
                       <section className='flex items-center gap-3'>
                         <div className='bg-red-500 p-4 rounded-full w-4 h-4' style={{ backgroundImage: `url(${item.Thumbnail})` }}></div>
-                        <Link to={item.streamerId || item.Creator.Username}>{item.streamerName || item.Creator.Username}</Link>
+                        <Link to={item.Id || item.Creator.Username}>{item.username || item.Creator.Username}</Link>
                       </section>
                     </div>
                   </motion.div>
