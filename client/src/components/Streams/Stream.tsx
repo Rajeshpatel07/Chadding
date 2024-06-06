@@ -3,18 +3,17 @@ import useViewer from '../../hooks/useViewer'
 import Chat from '../Video/Chat';
 import Profile from '../Profile/Profile';
 import Recomended from '../Extra/Recomended';
-import { useLocation } from 'react-router-dom';
 import NotFound from '../Extra/NotFound';
 
 const Stream: React.FC = () => {
-
-
-  const location = useLocation();
-  console.log("location", location);
   const { remoteVideoRef, init, title, path } = useViewer();
 
   useEffect(() => {
     init();
+
+    return () => {
+      console.log("clean up function in Stream component");
+    }
   })
 
   if (path.current) return <NotFound />

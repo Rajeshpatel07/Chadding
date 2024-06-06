@@ -1,14 +1,15 @@
-import { useState, useRef, useMemo } from 'react'
+import { useState, useRef } from 'react'
 import { peerConnection } from '../services/Webrtc'
 import axios from 'axios';
 import { io } from 'socket.io-client';
-import base64 from '../services/Base64';
-import { Stream } from '../components';
+import { base64, isBase64 } from '../services/Base64';
 
+export const socket = io('http://localhost:5000', {
+  transports: ['websocket']
+});
 
 const useStreamer = () => {
 
-  const socket = useMemo(() => io('http://localhost:5000', { autoConnect: false }), []);
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
   const [check, setCheck] = useState<boolean>(false);
   const localVideoRef = useRef<HTMLVideoElement | null>(null);
@@ -51,10 +52,8 @@ const useStreamer = () => {
     try {
       if (peerConnection.peer) {
         peerConnection.peer.onnegotiationneeded = () => handleNegotiationNeededEvent();
-        console.log("stream", Stream)
         //pushing the localstream to the peerConnection
         localStream?.getTracks().forEach(track => {
-          console.log("track", track)
           peerConnection.peer?.addTrack(track, localStream);
         });
       }
@@ -62,20 +61,12 @@ const useStreamer = () => {
       if (localStream && check) {
         recordMedia(localStream)
       }
-      try {
-        await socket.connect();
-        socket.emit("join:streamer", {
-          Id: JSON.parse(localStorage.getItem("UserId") || '""'),
-        })
-      } catch (socketError) {
-        console.error("Error connecting to socket:", socketError);
-        // Handle socket connection error
-      }
+      // socket.connect();
 
     } catch (error) {
       console.log(error)
     }
-  }
+  };
 
   const handleNegotiationNeededEvent = async () => {
     try {
@@ -85,13 +76,17 @@ const useStreamer = () => {
         sdp: peerConnection.peer?.localDescription,
         Id: JSON.parse(localStorage.getItem('UserId') || '""'),
         username: JSON.parse(localStorage.getItem('Username') || '""'),
-        thumbnail: Imageurl.current,
         title: VideoTitle.current?.value
       };
 
       const { data } = await axios.post('/api/broadcast', payload);
       const desc = new RTCSessionDescription(data.sdp);
       await peerConnection.setAnswer(desc)
+      socket.emit("join:streamer", {
+        Id: JSON.parse(localStorage.getItem("UserId") || '""'),
+        thumbnail: Imageurl.current,
+
+      });
 
     } catch (error) {
       console.log(error)
@@ -103,6 +98,7 @@ const useStreamer = () => {
       localStream.getTracks().forEach(track => {
         track.stop();
       })
+
       peerConnection.peer?.close();
       if (check) {
         mediaRecorder.current?.stop();
@@ -131,20 +127,20 @@ const useStreamer = () => {
           mediaRecorder.current.ondataavailable = async (event) => {
             chunks.current.push(event.data);
             const superbuffer = new Blob(chunks.current);
-            console.log(superbuffer);
-            console.log(chunks);
 
             try {
               const formData = new FormData();
               formData.append('video', superbuffer, `${VideoTitle.current?.value}.webm`); // Change 'video' to 'files'
               if (Imageurl.current) {
-                const imageBlob = base64(Imageurl.current);
-                formData.append('image', imageBlob, `${VideoTitle.current?.value}.jpg`)
+                if (isBase64(Imageurl.current)) {
+                  const imageBlob = base64(Imageurl.current);
+                  formData.append('image', imageBlob, `${VideoTitle.current?.value}.jpg`)
+                }
+                formData.append('Image', Imageurl.current);
               }
               formData.append('Title', VideoTitle.current?.value || '');
               formData.append('Id', JSON.parse(localStorage.getItem('UserId') || '""'));
               const response = await axios.post('/api/video', formData);
-              console.log('formData', formData);
               console.log(response);
             } catch (error) {
               console.log(error);
@@ -153,6 +149,7 @@ const useStreamer = () => {
         }
       }
     };
+
     mediaRecorder.current.start()
   }
 

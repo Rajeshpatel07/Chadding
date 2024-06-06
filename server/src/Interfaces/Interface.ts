@@ -18,8 +18,14 @@ export interface liveStreamsInterface {
   Id: string;
   Title: string;
   username: string;
-  Thumbnail: string;
+  Thumbnail?: string;
   socketId?: string;
   MediaStream: Array<MediaStream>;
+  peer: RTCPeerConnection;
+}
+
+export interface Viewers {
+  Id: string;
+  socketId: string;
   peer: RTCPeerConnection;
 }
