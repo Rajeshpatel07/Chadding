@@ -3,7 +3,7 @@ import { VideoInterface } from "../Interfaces/DBInterfaces.js";
 import { addVideo, getSingleVideo, Videos } from "../services/Video.js"
 //@ts-ignore
 import webrtc, { MediaStream } from 'wrtc';
-import { liveStreamsInterface, streamerStreams } from "../Interfaces/Interface.js";
+import { Viewers, liveStreamsInterface, streamerStreams } from "../Interfaces/Interface.js";
 import fs from 'fs'
 import path from "path";
 
@@ -31,9 +31,10 @@ const Servers = {
 
 
 export let liveStreams: Array<liveStreamsInterface> = [];
+let viewers: Array<Viewers> = [];
 
 export const AddVideo = async (req: Request, res: Response) => {
-  const { Title, Id } = req.body;
+  const { Title, Id, Image } = req.body;
 
   if (!Title || !Id || !req.files) {
     return res.status(403).json({ msg: "All fields are mandatory" });
@@ -43,13 +44,17 @@ export const AddVideo = async (req: Request, res: Response) => {
 
   try {
     const videoFile = files.video?.[0].filename;
-    const imageFile = files.image?.[0].filename;
+    let imageFile = files.image?.[0].filename;
+    if (!imageFile) {
+      imageFile = Image;
+    }
 
-    if (!videoFile || !imageFile) {
+    if (!videoFile) {
       return res.status(403).json({ msg: "Both video and image files are required" });
     }
 
     const newVideo = await addVideo(Title, videoFile, imageFile, Id);
+    console.log(newVideo);
     return res.json(newVideo);
 
     // res.json({ message: 'Files uploaded successfully', videoPath, imagePath });
@@ -133,7 +138,6 @@ export const broadcast = async (req: Request, res: Response) => {
       Id: req.body.Id,
       Title: req.body.title,
       username: req.body.username,
-      Thumbnail: req.body.thumbnail,
       MediaStream: streams,
       peer: peer
     })
@@ -173,7 +177,11 @@ export const viewer = async (req: Request, res: Response) => {
         peer.close();
         return;
       }
-
+      viewers.push({
+        Id: body.Id,
+        socketId: body.roomId,
+        peer: peer
+      });
       // console.log("singleStreamer", singleStreamer);
       const combinedStream: MediaStream = new MediaStream(
         [...(singleStreamer?.MediaStream[0]?.getTracks() ?? []),
@@ -228,7 +236,7 @@ export const endStream = (req: Request, res: Response) => {
 
   if (!Id) return res.json({ msg: "Id is Undefined" });
 
-  console.log(liveStreams);
+  // console.log(liveStreams);
   // Close the peer connections for the streamer
   liveStreams.forEach(stream => {
     if (stream.Id === Id) {
@@ -236,6 +244,7 @@ export const endStream = (req: Request, res: Response) => {
         mediaStream.getTracks().forEach(track => track.stop());
       });
       stream.peer.close();
+      stream.peer = null;
       console.log("Stream peer connection is closed");
     }
   });
@@ -243,3 +252,25 @@ export const endStream = (req: Request, res: Response) => {
   liveStreams = liveStreams.filter(stream => stream.Id !== Id);
   res.json({ msg: "success", liveStreams });
 };
+
+export const stopViewer = (req: Request, res: Response) => {
+  const { Id } = req.body;
+  console.log("request form stop viewer stream");
+  if (!Id) return res.json({ err: "Id is undefined" });
+
+  console.log(viewers);
+
+  viewers.forEach(stream => {
+    if (stream.Id === Id) {
+      stream.peer.getTracks().forEach(track => track.stop());
+      stream.peer.close();
+      stream.peer = null;
+      return;
+    }
+  })
+  viewers.filter(stream => {
+    stream.Id !== Id
+  })
+
+  res.json({ msg: "success" });
+}

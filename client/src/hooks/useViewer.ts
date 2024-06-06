@@ -44,14 +44,15 @@ const useViewer = () => {
   const handleNegotiationNeededEvent = async () => {
     try {
       const offer = await peerConnection.createOffer();
+      const Id = JSON.parse(localStorage.getItem("UserId") || "''").length > 0 ? JSON.parse(localStorage.getItem("UserId") || "''") : JSON.parse(localStorage.getItem("randomId") || "''")
+
       const payload = {
         sdp: offer,
-        roomId: params.streamId
+        roomId: params.streamId,
+        Id: Id,
       };
       const { data } = await axios.post('/api/viewer', payload);
-      console.log(data)
       setTitle(data.Title);
-      console.log(data.Title.length);
       if (data.Title.length < 1) {
         path.current = true;
         peerConnection.peer?.close();
@@ -70,6 +71,7 @@ const useViewer = () => {
     init,
     title,
     path,
+    params,
   }
 }
 

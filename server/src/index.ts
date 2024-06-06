@@ -15,19 +15,16 @@ const app = express();
 const server = createServer(app);
 export const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: ["http://localhost:5173", "http://localhost:5500"],
     methods: ["GET", "POST"],
     credentials: true
-  }
+  },
+  transports: ['websocket']
 });
 export const prisma = new PrismaClient();
 
-app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:3000'], // Allow requests from these origins
-  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allow these HTTP methods
-  allowedHeaders: ['Content-Type', 'Authorization'], // Allow these headers
-  credentials: true // Include credentials in the response
-}));
+app.use('/images', express.static("Storage/Images"));
+app.use(cors());
 app.use(express.json());
 app.use(cookieParser())
 app.use(bodyParser.urlencoded({ extended: true }))
@@ -37,36 +34,37 @@ app.use('/api', router)
 //This should be removed
 app.use(status());
 
-
-
-
 io.on('connection', socket => {
 
   socket.on("join:streamer", (data) => {
-    console.log("Socket Id", socket.id);
     socket.join(socket.id);
     liveStreams.map((streamer) => {
       if (streamer.Id == data.Id) {
         streamer.socketId = socket.id;
+        streamer.Thumbnail = data.thumbnail;
         return;
       } else {
         console.log("streamer not found");
       }
     })
-    socket.emit("me", socket.id)
+    socket.emit("me", { socketId: socket.id })
   })
 
   socket.on("join:viewer", (data) => {
-    socket.join(data.Id);
+    socket.join(data.roomId);
   })
 
   socket.on("comment", data => {
-    io.to(data.roomId).emit("comment", data.message);
+    io.to(data.roomId).emit("comment", { comment: data.comment, username: data.username });
   })
 
   socket.on("disconnection", () => {
-    socket.disconnect();
-    console.log("Connection Closed")
+    try {
+      socket.disconnect();
+      console.log("Connection Closed")
+    } catch (error) {
+      console.log(error);
+    }
   })
 
 })

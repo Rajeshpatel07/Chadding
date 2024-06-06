@@ -4,6 +4,7 @@ import axios from 'axios';
 import Loading from '../Extra/Loading';
 import { Link } from 'react-router-dom';
 import { liveStreamsInterface } from '../../services/Interfaces';
+import { v4 as uuid } from 'uuid';
 
 interface Streams {
   LiveStreams: Array<liveStreamsInterface>;
@@ -14,6 +15,9 @@ const Home: React.FC = () => {
   const [stream, setStream] = useState<Streams | null>(null)
 
   useEffect(() => {
+    console.log("useEffect run");
+    const id = uuid();
+    localStorage.setItem("randomId", JSON.stringify(id.slice(0, 8)));
     (async function() {
       try {
         const response = await axios.get("/api/livestreams");
@@ -22,7 +26,6 @@ const Home: React.FC = () => {
         console.log(error)
       }
     })()
-
     return () => {
       console.log("Unmounted");
     }
@@ -49,6 +52,7 @@ const Home: React.FC = () => {
       <Suspense fallback={<Loading />}>
         <Carsual link="Top" Stream={stream.LiveStreams} />
         <Carsual link="Recommended" Stream={stream.videos} />
+        <Carsual link="Action" Stream={stream.videos} />
       </Suspense>
     </div>
   )

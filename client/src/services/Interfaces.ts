@@ -1,20 +1,20 @@
 export interface liveStreamsInterface {
-  streamerName: string;
-  streamerId: string;
+  Id: string;
+  username: string;
+  Title: string;
   Thumbnail: string;
   socketId: string;
-  Title: string;
-  MediaStream: MediaStream;
 }
 
 export interface offlineStreamInterface {
-  CreatorBy: string;
   Id: string;
   Title: string;
   Thumbnail: string;
-  createdAt: Date;
-  updatedAt: Date;
-  videoPath: string;
+  CreatorBy: string;
+  Creator: {
+    Id: string;
+    Username: string;
+  }
 
 }
 

@@ -12,7 +12,7 @@ const NavBar: React.FC = () => {
       <div className="flex">
         <div className="flex items-center gap-10">
           <Link to="/" className=" flex items-center gap-2 ">
-            <img src="/favicon.png" alt="Logo" className="w-[45px]" />
+            <img src="/favicon.png" alt="Logo" width="45px" height="auto" />
             <h1 className="text-2xl text-white font-bold font-serif">
               Chadding
             </h1>
@@ -49,7 +49,7 @@ export default NavBar;
 
 const UserStatus: React.FC = () => {
   const [token, setToken] = useState<boolean>(true);
-  const [username, setUsername] = useState<String>('');
+  const [username, setUsername] = useState<string>('');
 
   useEffect(() => {
     (async function() {
