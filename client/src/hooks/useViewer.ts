@@ -1,11 +1,11 @@
-import { useMemo, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { peerConnection } from '../services/Webrtc'
 import axios from 'axios';
-import { io } from 'socket.io-client';
 import { useParams } from 'react-router-dom';
 
+const socket = new WebSocket('ws://localhost:5000');
+
 const useViewer = () => {
-  const socket = useMemo(() => io('http://localhost:5000', { autoConnect: false }), []);
   const remoteVideoRef = useRef<HTMLVideoElement | null>(null);
   const [title, setTitle] = useState<string>('');
   const params = useParams();
@@ -26,10 +26,12 @@ const useViewer = () => {
           }
         };
         if (params) {
-          socket.emit("join:viewer", {
+          const payload = {
+            event: "join:viewer",
             roomId: params.streamId,
             Id: JSON.parse(localStorage.getItem("UserId") || "''")
-          })
+          }
+          socket.send(JSON.stringify(payload))
         } else {
           console.log("roomId is empty")
         }
@@ -44,7 +46,7 @@ const useViewer = () => {
   const handleNegotiationNeededEvent = async () => {
     try {
       const offer = await peerConnection.createOffer();
-      const Id = JSON.parse(localStorage.getItem("UserId") || "''").length > 0 ? JSON.parse(localStorage.getItem("UserId") || "''") : JSON.parse(localStorage.getItem("randomId") || "''")
+      const Id = JSON.parse(localStorage.getItem("UserId")) ?? JSON.parse(localStorage.getItem("randomId"))
 
       const payload = {
         sdp: offer,

@@ -17,7 +17,6 @@ model User {
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
   videos       Video[]
-  comments     Comment[]
 }
 
 model Video {
@@ -32,11 +31,3 @@ model Video {
   comments  Comment[]
 }
 
-model Comment {
-  Id        String @id @default(uuid())
-  comment   String
-  video     Video  @relation(fields: [videoId], references: [Id])
-  videoId   String
-  Creator   User   @relation(fields: [CreatedBy], references: [Id])
-  CreatedBy String
-}

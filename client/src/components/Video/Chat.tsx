@@ -13,23 +13,35 @@ const Chat: React.FC = () => {
     e.preventDefault();
     const username = JSON.parse(localStorage.getItem("Username") || "''") || JSON.parse(localStorage.getItem("randomId") || "''")
     if (!inputRef.current?.value) return;
-    socket.emit("comment", { roomId: socketId, comment: inputRef.current?.value, username: username })
+    const payload = {
+      event: "comment",
+      roomId: socketId,
+      comment: inputRef.current?.value,
+      username: username
+    };
+
+    console.log("websocket is open")
+    socket.send(JSON.stringify(payload));
+
     inputRef.current.value = '';
   }
 
   useEffect(() => {
     if (streamId) setSocketId(streamId);
-    socket.on("me", data => {
-      setSocketId(data.socketId);
-    })
-    socket.emit("join:viewer", { roomId: socketId });
-
-
-    return () => {
-      socket.off("me");
-      socket.off("join:viewer");
-      console.log("the cleanup function in Chat run")
+    socket.onmessage = (event) => {
+      const data = event.data.toString();
+      const message = JSON.parse(data);
+      if (message.type == "me") {
+        setSocketId(message.socketId);
+      }
     };
+    const payload = {
+      event: "join:viewer",
+      roomId: socketId
+    }
+    if (socket.readyState === WebSocket.OPEN) {
+      socket.send(JSON.stringify(payload));
+    }
   }, [socketId, streamId]);
 
   if (socketId.length < 1) return <Loading />
@@ -67,16 +79,17 @@ const Message: React.FC = () => {
   }, [setComments]);
 
   useEffect(() => {
-    socket.on('comment', handleNewComment);
+    socket.onmessage = (event) => {
+      const data = event.data.toString();
+      const message = JSON.parse(data);
+      if (message.type === "comment") {
+        handleNewComment(message);
+      }
+    }
 
     if (scrollElement.current) {
       scrollElement.current.scrollTop = scrollElement.current.scrollHeight;
     }
-
-
-    return () => {
-      socket.off('comment');
-    };
   }, [handleNewComment]);
 
   return (

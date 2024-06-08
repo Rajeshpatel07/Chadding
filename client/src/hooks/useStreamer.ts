@@ -1,12 +1,9 @@
 import { useState, useRef } from 'react'
 import { peerConnection } from '../services/Webrtc'
 import axios from 'axios';
-import { io } from 'socket.io-client';
 import { base64, isBase64 } from '../services/Base64';
 
-export const socket = io('http://localhost:5000', {
-  transports: ['websocket']
-});
+export const socket = new WebSocket('ws://localhost:5000');
 
 const useStreamer = () => {
 
@@ -82,11 +79,13 @@ const useStreamer = () => {
       const { data } = await axios.post('/api/broadcast', payload);
       const desc = new RTCSessionDescription(data.sdp);
       await peerConnection.setAnswer(desc)
-      socket.emit("join:streamer", {
+      const socketPayload = {
+        event: "join:streamer",
         Id: JSON.parse(localStorage.getItem("UserId") || '""'),
         thumbnail: Imageurl.current,
 
-      });
+      }
+      socket.send(JSON.stringify(socketPayload));
 
     } catch (error) {
       console.log(error)
@@ -103,8 +102,7 @@ const useStreamer = () => {
       if (check) {
         mediaRecorder.current?.stop();
       }
-      socket.emit("disconnection");
-      socket.disconnect();
+      socket.close(1000, "disconnection");
       try {
         const response = await axios.post("/api/stopstream", {
           Id: JSON.parse(localStorage.getItem("UserId") || '""')

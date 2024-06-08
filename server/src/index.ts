@@ -3,6 +3,7 @@ import express from "express";
 import router from "./routes/routes.js"
 import { PrismaClient } from "@prisma/client";
 import { Server } from "socket.io";
+import WebSocket, { WebSocketServer } from "ws";
 import cors from 'cors'
 import cookieParser from 'cookie-parser';
 import bodyParser from "body-parser";
@@ -10,17 +11,11 @@ import { liveStreams } from "./controllers/video.controllers.js";
 
 //This is only for performance purpose remove it after the testing.
 import status from 'express-status-monitor'
+import { randomUUID } from "crypto";
 
 const app = express();
 const server = createServer(app);
-export const io = new Server(server, {
-  cors: {
-    origin: ["http://localhost:5173", "http://localhost:5500"],
-    methods: ["GET", "POST"],
-    credentials: true
-  },
-  transports: ['websocket']
-});
+export const wss = new WebSocketServer({ server: server });
 export const prisma = new PrismaClient();
 
 app.use('/images', express.static("Storage/Images"));
@@ -34,40 +29,56 @@ app.use('/api', router)
 //This should be removed
 app.use(status());
 
-io.on('connection', socket => {
+let clients: Array<{ socketId: string; roomId: string; }> = [];
 
-  socket.on("join:streamer", (data) => {
-    socket.join(socket.id);
-    liveStreams.map((streamer) => {
-      if (streamer.Id == data.Id) {
-        streamer.socketId = socket.id;
-        streamer.Thumbnail = data.thumbnail;
-        return;
-      } else {
-        console.log("streamer not found");
-      }
-    })
-    socket.emit("me", { socketId: socket.id })
-  })
+wss.on('connection', (ws) => {
 
-  socket.on("join:viewer", (data) => {
-    socket.join(data.roomId);
-  })
+  const socketId = randomUUID();
+  ws.on('message', (data) => {
 
-  socket.on("comment", data => {
-    io.to(data.roomId).emit("comment", { comment: data.comment, username: data.username });
-  })
-
-  socket.on("disconnection", () => {
     try {
-      socket.disconnect();
-      console.log("Connection Closed")
+      const message = JSON.parse(data);
+      switch (message.event) {
+        case 'join:streamer':
+          liveStreams.map((streamer) => {
+            if (streamer.Id === message.Id) {
+              streamer.socketId = socketId;
+              streamer.Thumbnail = message.thumbnail;
+              return;
+            } else {
+              console.log('Streamer not found');
+            }
+          });
+          ws.send(JSON.stringify({ type: "me", socketId: socketId }));
+          break;
+
+        case 'join:viewer':
+          if (message.roomId) {
+            clients.push({ socketId: socketId, roomId: message.roomId });
+          }
+          break;
+
+        case 'comment':
+          wss.clients.forEach((client) => {
+            if (client.readyState === WebSocket.OPEN) {
+              client.send(JSON.stringify({ type: 'comment', comment: message.comment, username: message.username }));
+            }
+          });
+          break;
+
+        default:
+          console.log('Unknown event');
+      }
     } catch (error) {
       console.log(error);
     }
-  })
+  });
 
-})
-
-
+  ws.on('close', () => {
+    clients = clients.filter(client => {
+      client.socketId !== socketId;
+    })
+    console.log('Connection closed');
+  });
+});
 server.listen(5000, () => console.log(`Server started at 5000`));

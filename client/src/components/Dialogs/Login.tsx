@@ -53,12 +53,12 @@ const Login: React.FC = () => {
       >
         <div className="modal-box bg-black">
           <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" onClick={closeDialog}>✕</button>
-          <div className="w-full max-w-md p-8 space-y-3 rounded-xl  text-gray-100">
+          <div className="w-full max-w-md py-8 px-2 md:px-8 space-y-3 rounded-xl  text-gray-100">
             <h1 className="text-3xl font-bold text-center">Login</h1>
             <form onSubmit={formSubmit} className="space-y-6">
               <div className="space-y-1 text-sm">
                 <label htmlFor="username" className="block text-white text-sm">Username</label>
-                <input type="email" placeholder="example@gmail.com" className="input input-bordered w-full "
+                <input type="email" autoFocus placeholder="example@gmail.com" className="input input-bordered w-full "
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
