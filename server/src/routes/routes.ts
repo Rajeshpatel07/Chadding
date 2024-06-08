@@ -3,7 +3,6 @@ import { Home, Profile, login, signup } from "../controllers/controllers.js"
 import { checkAuthToken } from "../middlewares/Jwt.js";
 import { AddVideo, GetVideo, viewer, broadcast, getLiveStreams, endStream, stopViewer } from "../controllers/video.controllers.js";
 import { getUser, getUserVideos, UpdateProfile } from "../controllers/user.controllers.js";
-import { AddComment, getComments } from "../controllers/comment.controllers.js";
 import uploadFields from "../services/Multer.js"
 
 
@@ -21,10 +20,6 @@ router.route("/user/updateprofile").post(UpdateProfile);
 router.route("/video/:Id").get(GetVideo);
 router.route("/video").post(uploadFields, AddVideo);
 router.route("/livestreams").get(getLiveStreams);
-
-router.route("/video/comment/:Id").get(getComments);
-router.route("/video/comment").post(AddComment);
-
 
 router.route("/broadcast").post(broadcast);
 router.route("/viewer").post(viewer);

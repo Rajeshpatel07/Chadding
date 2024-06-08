@@ -3,7 +3,7 @@ import { VideoInterface } from "../Interfaces/DBInterfaces.js";
 import { addVideo, getSingleVideo, Videos } from "../services/Video.js"
 //@ts-ignore
 import webrtc, { MediaStream } from 'wrtc';
-import { Viewers, liveStreamsInterface, streamerStreams } from "../Interfaces/Interface.js";
+import { Viewers, liveStreamsInterface } from "../Interfaces/Interface.js";
 import fs from 'fs'
 import path from "path";
 
@@ -28,7 +28,6 @@ const Servers = {
 //       username: '28224511:1379330808',
 //       credential: 'JZEOEt2V3Qb0y27GRntt2u2PAYA='
 // },
-
 
 export let liveStreams: Array<liveStreamsInterface> = [];
 let viewers: Array<Viewers> = [];
@@ -93,7 +92,6 @@ export const GetVideo = async (req: Request, res: Response) => {
         res.status(416).send('Requested range not satisfiable');
         return;
       }
-
       const chunkSize = end - start + 1;
       const file = fs.createReadStream(video.videoPath, { start, end });
 
@@ -125,7 +123,6 @@ export const broadcast = async (req: Request, res: Response) => {
   const body = req.body;
   console.log("request for broadcast");
   try {
-
     //@ts-ignore
     const peer = new webrtc.RTCPeerConnection(Servers);
 
@@ -150,17 +147,17 @@ export const broadcast = async (req: Request, res: Response) => {
     }
 
     res.json(payload);
-
-    // peer.close();
     return;
   } catch (error) {
     console.log(error)
   }
 }
 
+
 export const viewer = async (req: Request, res: Response) => {
   const body = req.body;
-  console.log("Request for viewer")
+  console.log("Request for viewer");
+
   try {
     //@ts-ignore
     const peer = new webrtc.RTCPeerConnection(Servers);
@@ -169,46 +166,37 @@ export const viewer = async (req: Request, res: Response) => {
     let singleStreamer: liveStreamsInterface | undefined;
 
     if (liveStreams) {
-      singleStreamer = liveStreams.find((stream) => {
-        return stream.socketId == body.roomId;
-      });
-
+      singleStreamer = liveStreams.find((stream) => stream.socketId === body.roomId);
       if (!singleStreamer) {
         peer.close();
         return;
       }
+
       viewers.push({
         Id: body.Id,
         socketId: body.roomId,
-        peer: peer
+        peer,
       });
-      // console.log("singleStreamer", singleStreamer);
-      const combinedStream: MediaStream = new MediaStream(
-        [...(singleStreamer?.MediaStream[0]?.getTracks() ?? []),
-        ...(singleStreamer?.MediaStream[1]?.getTracks() ?? [])]
-      );
 
-      combinedStream.getTracks().forEach((track: RTCTrackEvent) => {
-        peer.addTrack(track, combinedStream);
-      });
+      const combinedStream = new MediaStream([...singleStreamer.MediaStream[0].getTracks(), ...singleStreamer.MediaStream[1].getTracks()]);
+      combinedStream.getTracks().forEach((track: RTCTrackEvent) => peer.addTrack(track, combinedStream));
     }
 
     const answer = await peer.createAnswer();
     await peer.setLocalDescription(answer);
+
     const payload = {
       sdp: peer.localDescription,
       Title: singleStreamer?.Title || '',
       Streamername: singleStreamer?.username || '',
-    }
+    };
 
     res.json(payload);
-    // peer.close();
-    return;
-
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
-}
+};
+
 
 export const getLiveStreams = async (req: Request, res: Response) => {
   if (liveStreams.length < 0) {
@@ -233,11 +221,8 @@ export const getLiveStreams = async (req: Request, res: Response) => {
 
 export const endStream = (req: Request, res: Response) => {
   const { Id } = req.body;
-
   if (!Id) return res.json({ msg: "Id is Undefined" });
 
-  // console.log(liveStreams);
-  // Close the peer connections for the streamer
   liveStreams.forEach(stream => {
     if (stream.Id === Id) {
       stream.MediaStream.forEach(mediaStream => {
@@ -248,7 +233,6 @@ export const endStream = (req: Request, res: Response) => {
       console.log("Stream peer connection is closed");
     }
   });
-  // Filter out the live streams for the streamer
   liveStreams = liveStreams.filter(stream => stream.Id !== Id);
   res.json({ msg: "success", liveStreams });
 };
@@ -258,11 +242,8 @@ export const stopViewer = (req: Request, res: Response) => {
   console.log("request form stop viewer stream");
   if (!Id) return res.json({ err: "Id is undefined" });
 
-  console.log(viewers);
-
   viewers.forEach(stream => {
     if (stream.Id === Id) {
-      stream.peer.getTracks().forEach(track => track.stop());
       stream.peer.close();
       stream.peer = null;
       return;

@@ -8,7 +8,7 @@ const NavBar: React.FC = () => {
 
 
   return (
-    <div className="navbar flex justify-between items-center px-8 py-4 bg-black ">
+    <div className="navbar flex justify-between items-center px-3 py-4 bg-black ">
       <div className="flex">
         <div className="flex items-center gap-10">
           <Link to="/" className=" flex items-center gap-2 ">

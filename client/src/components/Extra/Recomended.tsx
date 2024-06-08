@@ -12,7 +12,7 @@ const Recomended: React.FC = () => {
             <div>
                 {
                     Games.map(game => (
-                        <div className="flex items-center gap-2 p-2" key={game.id}>
+                        <div className="flex items-center gap-2 py-2" key={game.id}>
                             <figure className="w-52 h-32 bg-cover box-border p-2">
                                 <img src={game.image} alt={game.streamer_name}
                                     className="rounded-md" />
