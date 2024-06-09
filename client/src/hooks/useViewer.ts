@@ -25,6 +25,18 @@ const useViewer = () => {
             remoteVideoRef.current.srcObject = event.streams[0];
           }
         };
+        peerConnection.peer.onicechange = () => {
+          if (peerConnection.iceConnectionState === 'connected') {
+            console.log('Peer connection is connected and playing');
+          } else if (peerConnection.iceConnectionState === 'failed') {
+            console.log('Peer connection failed');
+          } else if (peerConnection.iceConnectionState === 'disconnected') {
+            console.log('Peer connection disconnected');
+          } else {
+            console.log('Peer connection is still connecting');
+          }
+        };
+
         if (params) {
           const payload = {
             event: "join:viewer",

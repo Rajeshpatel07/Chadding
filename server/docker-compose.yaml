@@ -1,0 +1,30 @@
+version: '2.2'
+services:
+  chadding:
+    build: .
+    ports: 
+      - '5000:5000'
+    depends_on:
+      - redis
+      - mysql
+    restart: always
+    env_file:
+    - .env
+    volumes:
+      - .:/app
+
+  redis:
+    image: redis/redis-stack-server
+    ports:
+      - "6379:6379"
+
+  mysql:
+    image: mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=root
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+volumes:
+  mysql-data:

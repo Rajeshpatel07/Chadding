@@ -2,11 +2,11 @@ import { createServer } from "http";
 import express from "express";
 import router from "./routes/routes.js"
 import { PrismaClient } from "@prisma/client";
-import { Server } from "socket.io";
 import WebSocket, { WebSocketServer } from "ws";
 import cors from 'cors'
 import cookieParser from 'cookie-parser';
 import bodyParser from "body-parser";
+import { Redis } from "ioredis";
 import { liveStreams } from "./controllers/video.controllers.js";
 
 //This is only for performance purpose remove it after the testing.
@@ -17,6 +17,7 @@ const app = express();
 const server = createServer(app);
 export const wss = new WebSocketServer({ server: server });
 export const prisma = new PrismaClient();
+export const redis = new Redis();
 
 app.use('/images', express.static("Storage/Images"));
 app.use(cors());
@@ -34,7 +35,7 @@ let clients: Array<{ socketId: string; roomId: string; }> = [];
 wss.on('connection', (ws) => {
 
   const socketId = randomUUID();
-  ws.on('message', (data) => {
+  ws.on('message', (data: string) => {
 
     try {
       const message = JSON.parse(data);

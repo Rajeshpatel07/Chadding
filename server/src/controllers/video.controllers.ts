@@ -6,6 +6,7 @@ import webrtc, { MediaStream } from 'wrtc';
 import { Viewers, liveStreamsInterface } from "../Interfaces/Interface.js";
 import fs from 'fs'
 import path from "path";
+import { redis } from "../index.js";
 
 const Servers = {
   iceServers: [
@@ -120,8 +121,6 @@ export const GetVideo = async (req: Request, res: Response) => {
 };
 
 export const broadcast = async (req: Request, res: Response) => {
-  const body = req.body;
-  console.log("request for broadcast");
   try {
     //@ts-ignore
     const peer = new webrtc.RTCPeerConnection(Servers);
@@ -138,7 +137,7 @@ export const broadcast = async (req: Request, res: Response) => {
       MediaStream: streams,
       peer: peer
     })
-    const desc = new webrtc.RTCSessionDescription(body.sdp);
+    const desc = new webrtc.RTCSessionDescription(req.body.sdp);
     await peer.setRemoteDescription(desc);
     const answer = await peer.createAnswer();
     await peer.setLocalDescription(answer);
@@ -155,26 +154,23 @@ export const broadcast = async (req: Request, res: Response) => {
 
 
 export const viewer = async (req: Request, res: Response) => {
-  const body = req.body;
-  console.log("Request for viewer");
-
   try {
     //@ts-ignore
     const peer = new webrtc.RTCPeerConnection(Servers);
-    const desc = new webrtc.RTCSessionDescription(body.sdp);
+    const desc = new webrtc.RTCSessionDescription(req.body.sdp);
     await peer.setRemoteDescription(desc);
     let singleStreamer: liveStreamsInterface | undefined;
 
     if (liveStreams) {
-      singleStreamer = liveStreams.find((stream) => stream.socketId === body.roomId);
+      singleStreamer = liveStreams.find((stream) => stream.socketId === req.body.roomId);
       if (!singleStreamer) {
         peer.close();
         return;
       }
 
       viewers.push({
-        Id: body.Id,
-        socketId: body.roomId,
+        Id: req.body.Id,
+        socketId: req.body.roomId,
         peer,
       });
 
@@ -199,11 +195,7 @@ export const viewer = async (req: Request, res: Response) => {
 
 
 export const getLiveStreams = async (req: Request, res: Response) => {
-  if (liveStreams.length < 0) {
-    return res.json({ msg: "No live streams found" });
-  }
   try {
-    const videos = await Videos();
     const LiveStreams = liveStreams.map((liveStream) => {
       return {
         Id: liveStream.Id,
@@ -213,11 +205,19 @@ export const getLiveStreams = async (req: Request, res: Response) => {
         socketId: liveStream.socketId,
       };
     });
-    return res.json({ LiveStreams, videos });
+
+    const streams = await redis.get('streams');
+    if (streams != null) {
+      return res.json({ LiveStreams, videos: JSON.parse(streams) });
+    } else {
+      const videos = await Videos();
+      await redis.set("streams", JSON.stringify(videos), 'EX', 10);
+      return res.json({ LiveStreams, videos });
+    }
   } catch (error) {
     console.log(error)
   }
-}
+};
 
 export const endStream = (req: Request, res: Response) => {
   const { Id } = req.body;
@@ -229,6 +229,7 @@ export const endStream = (req: Request, res: Response) => {
         mediaStream.getTracks().forEach(track => track.stop());
       });
       stream.peer.close();
+      //@ts-ignore
       stream.peer = null;
       console.log("Stream peer connection is closed");
     }
@@ -239,19 +240,23 @@ export const endStream = (req: Request, res: Response) => {
 
 export const stopViewer = (req: Request, res: Response) => {
   const { Id } = req.body;
-  console.log("request form stop viewer stream");
+  console.log("stop viewer Id", Id);
+  // console.log("viewers", viewers)
   if (!Id) return res.json({ err: "Id is undefined" });
 
   viewers.forEach(stream => {
     if (stream.Id === Id) {
       stream.peer.close();
+      //@ts-ignore
       stream.peer = null;
+      console.log("stream.peer = null");
       return;
     }
   })
-  viewers.filter(stream => {
-    stream.Id !== Id
+  viewers = viewers.filter(stream => {
+    return stream.Id != Id
   })
+  console.log("viewers", viewers)
 
-  res.json({ msg: "success" });
+  res.json({ msg: "success", viewers: viewers });
 }

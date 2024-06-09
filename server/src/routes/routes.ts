@@ -15,7 +15,7 @@ router.route("/profile/:Id").get(checkAuthToken, Profile);
 
 router.route("/user/:Id").get(getUser);
 router.route("/user/videos/:Id").get(getUserVideos);
-router.route("/user/updateprofile").post(UpdateProfile);
+router.route("/user/updateprofile").put(UpdateProfile);
 
 router.route("/video/:Id").get(GetVideo);
 router.route("/video").post(uploadFields, AddVideo);
