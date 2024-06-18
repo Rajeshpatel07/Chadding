@@ -8,8 +8,9 @@
     "schema": "./src/prisma/schema.prisma"
   },
   "scripts": {
+    "start":"node ./dist/index.js",
     "dev": "tsc --watch & nodemon ./dist/index.js",
-    "build": "tsc && cp -r ./src/prisma dist/"
+    "build": "npx tsc"
   },
   "dependencies": {
     "@prisma/client": "^5.11.0",

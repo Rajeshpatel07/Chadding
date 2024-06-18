@@ -13,6 +13,8 @@ import {
   Stream,
   Layout,
   VideoElement,
+  Call,
+  Join,
 } from "./components/index.ts";
 import App from "./App.tsx";
 import Loading from "./components/Extra/Loading.tsx";
@@ -57,6 +59,23 @@ const router = createBrowserRouter(
         element={
           <Suspense fallback={<Loading />}>
             <Layout />
+          </Suspense>
+        }
+      />
+
+      <Route
+        path="call"
+        element={
+          <Suspense fallback={<Loading />}>
+            <Call />
+          </Suspense>
+        }
+      />
+      <Route
+        path="join/:callId"
+        element={
+          <Suspense fallback={<Loading />}>
+            <Join />
           </Suspense>
         }
       />

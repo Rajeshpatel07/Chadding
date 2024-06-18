@@ -8,6 +8,8 @@ import cookieParser from 'cookie-parser';
 import bodyParser from "body-parser";
 import { Redis } from "ioredis";
 import { liveStreams } from "./controllers/video.controllers.js";
+import dotenv from 'dotenv'
+dotenv.config();
 
 //This is only for performance purpose remove it after the testing.
 import status from 'express-status-monitor'
@@ -17,7 +19,11 @@ const app = express();
 const server = createServer(app);
 export const wss = new WebSocketServer({ server: server });
 export const prisma = new PrismaClient();
-export const redis = new Redis();
+
+export const redis = new Redis({
+  host: process.env.REDIS_HOST || "redis-1",
+  port: Number(process.env.REDIS_PORT) || 6379
+});
 
 app.use('/images', express.static("Storage/Images"));
 app.use(cors());
