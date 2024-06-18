@@ -58,7 +58,6 @@ wss.on('connection', (ws) => {
           });
           ws.send(JSON.stringify({ type: "me", socketId: socketId }));
           break;
-
         case 'join:viewer':
           if (message.roomId) {
             clients.push({ socketId: socketId, roomId: message.roomId });

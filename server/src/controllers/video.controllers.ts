@@ -31,7 +31,6 @@ export let liveStreams: Array<liveStreamsInterface> = [];
 let viewers: Array<Viewers> = [];
 //@ts-ignore
 export let Groupcall: Array<T> = [];
-
 export const AddVideo = async (req: Request, res: Response) => {
   const { Title, Id, Image } = req.body;
 
@@ -167,9 +166,7 @@ export const viewer = async (req: Request, res: Response) => {
     let singleStreamer: liveStreamsInterface | undefined;
 
     if (liveStreams) {
-      singleStreamer = liveStreams.find(
-        (stream) => stream.socketId === req.body.roomId
-      );
+      singleStreamer = liveStreams.find((stream) => stream.socketId === body.roomId);
       if (!singleStreamer) {
         peer.close();
         return;
@@ -194,6 +191,7 @@ export const viewer = async (req: Request, res: Response) => {
 
     const answer = await peer.createAnswer();
     await peer.setLocalDescription(answer);
+
 
     const payload = {
       sdp: peer.localDescription,
@@ -298,12 +296,13 @@ export const createCall = async (req: Request, res: Response) => {
     const answer = await peer.createAnswer();
     await peer.setLocalDescription(answer)
     const payload = {
-      sdp: peer.localDescription
-    }
+      sdp: peer.localDescription,
+      Title: singleStreamer?.Title || '',
+      Streamername: singleStreamer?.username || '',
+    };
 
     res.json(payload);
     return;
-
 
   } catch (error) {
     console.log(error);
@@ -386,4 +385,3 @@ export const joinCall = async (req: Request, res: Response) => {
     console.log(error);
   }
 };
-
