@@ -1,0 +1,4 @@
+./dist
+./storage
+.env.sample
+/node_modules

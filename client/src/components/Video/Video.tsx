@@ -1,4 +1,5 @@
-import React, { memo, useState, useEffect, FormEvent, ChangeEvent } from 'react'
+
+import React, { useState, useEffect, FormEvent, ChangeEvent } from 'react'
 import useStreamer from '../../hooks/useStreamer';
 
 const Video: React.FC = () => {
@@ -33,6 +34,7 @@ const Video: React.FC = () => {
       setPreviewUrl(reader.result as string);
     };
     reader.readAsDataURL(file);
+
   }, [file]);
 
 
@@ -71,7 +73,6 @@ const Video: React.FC = () => {
                 <input type="text" id='Image_url' name='Image_url' onChange={(e) => setPreviewUrl(e.target.value)} placeholder='Enter the Thumbnail url' readOnly={readonly}
                   className='py-2 px-2 text-lg placeholder-white text-white bg-black rounded-lg outline-none w-full md:w-[50vw]' />
               </div>
-
               {previewUrl && <img src={previewUrl} alt="Preview" className="w-64" />}
             </div>
           </div>
@@ -93,4 +94,5 @@ const Video: React.FC = () => {
   )
 }
 
-export default memo(Video);
+
+export default Video;

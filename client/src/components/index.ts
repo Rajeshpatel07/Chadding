@@ -8,6 +8,8 @@ const SideBar = lazy(() => import("./Header/SideBar"))
 const Layout = lazy(() => import("./Video/Layout"))
 const Stream = lazy(() => import("./Streams/Stream"))
 const VideoElement = lazy(() => import("./Streams/VideoElement"))
+const Call = lazy(() => import("./Groupcall/Call"))
+const Join = lazy(() => import("./Groupcall/Join"))
 
 // import Home from "./Home/Home";
 // import Footer from "./Footer/Footer";
@@ -27,4 +29,6 @@ export {
   Layout,
   Stream,
   VideoElement,
+  Call,
+  Join
 }
