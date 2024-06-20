@@ -55,6 +55,7 @@ export const AddVideo = async (req: Request, res: Response) => {
 
     const newVideo = await addVideo(Title, videoFile, imageFile, Id);
     console.log(newVideo);
+    redis.publish("new_video", "");
     return res.json(newVideo);
 
     // res.json({ message: 'Files uploaded successfully', videoPath, imagePath });

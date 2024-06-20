@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3.0'
 services:
   chadding:
     build: .
@@ -12,6 +12,15 @@ services:
     restart: always
     env_file:
       - .env
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - MYSQL_HOST=${MYSQL_HOST}
+      - MYSQL_PORT=${MYSQL_PORT}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_DB=${MYSQL_DB}
     networks:
       - chadding
 
@@ -30,8 +39,8 @@ services:
   mysql:
     image: mysql
     environment:
-      - MYSQL_ROOT_PASSWORD=root
-      - MYSQL_DATABASE=Chadding
+      - MYSQL_ROOT_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DB}
     volumes:
       - mysql-data:/var/lib/mysql
       - ./mysql-config/my.cnf:/etc/mysql/my.cnf 

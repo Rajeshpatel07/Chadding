@@ -1,35 +1,39 @@
 [
   {
-    "Id": 5,
+    "Id": 1,
     "Title": "Minecraft",
     "Thumbnail": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRAdYE5RslJdlJJywY4ZHhJ5oGOIz5JOybzJNnNuGJ8qR_30fB9w6F-dzMB8TtMpfHuiTI&usqp=CAU",
+    "views":"2000",
     "Creator":{
       "Username":"Chandler"
     }
   },
   
   {
-    "Id": 5,
+    "Id": 2,
     "Title": "Red Dead Redemptoion 2",
     "Thumbnail": "https://wallpapers.com/images/high/red-dead-redemption-2-full-hd-ih17xbavwjw7t2cy.webp",
+    "views":"2000",
     "Creator":{
       "Username":"carlos"
     }
   },
   
   {
-    "Id": 5,
+    "Id": 3,
     "Title": "Fortnight",
     "Thumbnail": "https://wallpapers.com/images/high/fortnite-pc-88ki212f8d0p7ahb.webp",
+        "views":"2000",
     "Creator":{
       "Username":"nick"
     }
   },
   
   {
-    "Id": 5,
+    "Id": 4,
     "Title": "Pubg Mecha fushion",
     "Thumbnail": "https://wallpapers.com/images/hd/hd-all-pubg-characters-tuvb98wlnsr01muu.webp",
+    "views":"2000",
     "Creator":{
       "Username":"cornor"
     }
@@ -39,23 +43,26 @@
     "Id": 5,
     "Title": "Call of duty",
     "Thumbnail": "https://wallpapers.com/images/high/call-of-duty-mw-2019-oi3n4z6jonebk3iu.webp",
+    "views":"2000",
     "Creator":{
       "Username":"michal"
     }
   }, 
   {
-    "Id": 5,
+    "Id": 6,
     "Title": "valorant",
     "Thumbnail": "https://wallpapers.com/images/high/valorant-red-kay-o-xlcmyh3eh7zd1yuh.webp",
+    "views":"2000",
     "Creator":{
       "Username":"jonson"
     }
   },
   
   {
-    "Id": 5,
+    "Id": 7,
     "Title": "God of War",
     "Thumbnail": "https://wallpapers.com/images/high/god-of-war-3-wallpaper-e7fy7rvfe8x888hv.webp",
+    "views":"2000",
     "Creator":{
       "Username":"mikew"
     }

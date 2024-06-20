@@ -59,7 +59,7 @@ const Carsual: React.FC<props> = ({ link, Stream }) => {
                     }
 
                     <div className=' flex flex-col justify-center px-2 gap-2'>
-                      <h1 className='text-md text-white'>{item.Title}</h1>
+                      <h1 className='text-md text-white'>{item.Title.replaceAll("-", " ")}</h1>
                       <section className='flex items-center gap-3'>
                         <div className='bg-red-500 p-4 rounded-full w-4 h-4' style={{ backgroundImage: `url(${item.Thumbnail})` }}></div>
                         <Link to={`/${item.Id}/home` || `${item.Creator?.Username}/home`}>{item.username || item?.Creator?.Username}</Link>
