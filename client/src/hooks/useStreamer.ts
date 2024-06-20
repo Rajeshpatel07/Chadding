@@ -128,7 +128,8 @@ const useStreamer = () => {
 
             try {
               const formData = new FormData();
-              formData.append('video', superbuffer, `${VideoTitle.current?.value}.webm`); // Change 'video' to 'files'
+              const slug = VideoTitle.current?.value.replaceAll(" ", "-");
+              formData.append('video', superbuffer, `${slug}.webm`); // Change 'video' to 'files'
               if (Imageurl.current) {
                 if (isBase64(Imageurl.current)) {
                   const imageBlob = base64(Imageurl.current);
@@ -136,7 +137,7 @@ const useStreamer = () => {
                 }
                 formData.append('Image', Imageurl.current);
               }
-              formData.append('Title', VideoTitle.current?.value || '');
+              formData.append('Title', slug || '');
               formData.append('Id', JSON.parse(localStorage.getItem('UserId') || '""'));
               const response = await axios.post('/api/video', formData);
               console.log(response);

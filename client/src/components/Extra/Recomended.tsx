@@ -12,17 +12,21 @@ const Recomended: React.FC = () => {
             <div>
                 {
                     Games.map(game => (
-                        <div className="flex items-center gap-2 py-2" key={game.id}>
-                            <figure className="w-52 h-32 bg-cover box-border p-2">
-                                <img src={game.image} alt={game.streamer_name}
+                        <div className="flex items-center gap-2 py-2" key={game.Id}>
+                            <figure className="w-44 h-28 bg-cover box-border ">
+                                <img src={game.Thumbnail} alt={game.Title}
                                     className="rounded-md" />
                             </figure>
                             <div className="self-start">
-                                <h2 className="text-lg text-white">{game.title}</h2>
+                                <h2 className=" text-white">{game.Title}</h2>
                                 <div className="flex gap-3">
-                                    <div className="w-8 h-8 rounded-full bg-red-500"></div>
-                                    <h1 className="text-white text-md">stream name</h1>
+                                    <div className="w-6 h-6 rounded-full bg-red-500"></div>
+                                    <p className="text-white text-sm">{game.Creator.Username}</p>
                                 </div>
+                                <section className="flex items-center gap-2">
+                                    <p className="text-white text-sm">{game.views} views</p>
+                                    <p className="text-white text-sm">{game.views} views</p>
+                                </section>
                             </div>
                         </div>
                     ))

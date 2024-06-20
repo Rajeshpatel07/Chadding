@@ -7,13 +7,14 @@ import cors from 'cors'
 import cookieParser from 'cookie-parser';
 import bodyParser from "body-parser";
 import { Redis } from "ioredis";
+import { randomUUID } from "crypto";
 import { liveStreams } from "./controllers/video.controllers.js";
+import { Videos } from "./services/Video.js";
 import dotenv from 'dotenv'
 dotenv.config();
 
 //This is only for performance purpose remove it after the testing.
 import status from 'express-status-monitor'
-import { randomUUID } from "crypto";
 
 const app = express();
 const server = createServer(app);
@@ -21,10 +22,23 @@ export const wss = new WebSocketServer({ server: server });
 export const prisma = new PrismaClient();
 
 export const redis = new Redis({
-  host: process.env.REDIS_HOST || "redis-1",
-  port: Number(process.env.REDIS_PORT) || 6379
+  host: process.env.REDIS_HOST,
+  port: Number(process.env.REDIS_PORT)
+});
+const subscribeRedis = new Redis({
+  host: process.env.REDIS_HOST,
+  port: Number(process.env.REDIS_PORT)
 });
 
+
+subscribeRedis.on('message', async (channel, message) => {
+  if (channel === 'new_video') {
+    const videos = await Videos();
+    await redis.set('streams', JSON.stringify(videos));
+  }
+});
+
+//
 app.use('/images', express.static("Storage/Images"));
 app.use(cors());
 app.use(express.json());
