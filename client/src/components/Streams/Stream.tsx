@@ -1,20 +1,32 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import useViewer from '../../hooks/useViewer'
 import Chat from '../Video/Chat';
 import Profile from '../Profile/Profile';
 import Recomended from '../Extra/Recomended';
 import NotFound from '../Extra/NotFound';
+import axios from 'axios';
 
 const Stream: React.FC = () => {
   const { remoteVideoRef, init, title, path } = useViewer();
-
+  const [videoLoad, setVideoLoad] = useState<boolean>(false);
   useEffect(() => {
     init();
+    const handleBeforeUnload = async () => {
+      // Perform actions before the component unloads
+      const response = await axios.post('/api/stopviewer', {
+        Id: JSON.parse(localStorage.getItem("UserId")) ?? JSON.parse(localStorage.getItem("randomId"))
+      })
+      console.log("stop viewer", response)
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
 
     return () => {
-      console.log("clean up function in Stream component");
-    }
-  })
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      console.log("videoLoaded State", videoLoad);
+      if (videoLoad) handleBeforeUnload();
+    };
+  });
+
 
   if (path.current) return <NotFound />
 
@@ -24,7 +36,10 @@ const Stream: React.FC = () => {
         <section className='flex flex-col justify-center gap-3 md:flex-row box-border'>
           <div className='flex flex-col justify-start md:w-[73%]'>
             <div className="flex flex-col gap-3 justify-center w-full ">
-              <video className='w-full  h-64  md:h-46  bg-black' ref={remoteVideoRef} autoPlay controls />
+              <video className='w-full  h-64  md:h-46  bg-black' ref={remoteVideoRef} autoPlay controls
+                onLoadStart={() => setVideoLoad(true)}
+                onLoadedData={() => setVideoLoad(true)}
+              />
               <div className='flex justify-between items-center  flex-wrap px-5'>
                 <h1 className='text-3xl text-white font-serif'>{title}</h1>
                 <div className='flex items-center gap-3'>

@@ -8,6 +8,8 @@ import cookieParser from 'cookie-parser';
 import bodyParser from "body-parser";
 import { Redis } from "ioredis";
 import { randomUUID } from "crypto";
+import webrtc from 'wrtc'
+import { Groupcall } from "./controllers/video.controllers.js";
 import { liveStreams } from "./controllers/video.controllers.js";
 import { Videos } from "./services/Video.js";
 import dotenv from 'dotenv'
@@ -21,15 +23,21 @@ const server = createServer(app);
 export const wss = new WebSocketServer({ server: server });
 export const prisma = new PrismaClient();
 
-export const redis = new Redis({
-  host: process.env.REDIS_HOST,
-  port: Number(process.env.REDIS_PORT)
-});
-const subscribeRedis = new Redis({
-  host: process.env.REDIS_HOST,
-  port: Number(process.env.REDIS_PORT)
-});
+//comment these lines if you want to use docker
 
+export const redis = new Redis();
+const subscribeRedis = new Redis();
+
+// uncomment the below lines if you want to use docker.
+
+// export const redis = new Redis({
+//   host: process.env.REDIS_HOST,
+//   port: Number(process.env.REDIS_PORT)
+// });
+// const subscribeRedis = new Redis({
+//   host: process.env.REDIS_HOST,
+//   port: Number(process.env.REDIS_PORT)
+// });
 
 subscribeRedis.on('message', async (channel, message) => {
   if (channel === 'new_video') {
@@ -84,6 +92,16 @@ wss.on('connection', (ws) => {
               client.send(JSON.stringify({ type: 'comment', comment: message.comment, username: message.username }));
             }
           });
+          break;
+
+        case 'candidate': async () => {
+          const { candidate, callId } = message;
+          const call = Groupcall.find((c) => c.callId === callId);
+          console.log(call);
+          if (call) {
+            await call.peer.addIceCandidate(new webrtc.RTCIceCandidate(candidate));
+          }
+        }
           break;
 
         default:

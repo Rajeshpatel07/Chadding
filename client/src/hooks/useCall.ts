@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import { peerConnection } from "../services/Webrtc";
 import axios from "axios";
 
+const socket = new WebSocket("ws://localhost:5000");
 
 const useCall = () => {
 
@@ -49,6 +50,23 @@ const useCall = () => {
           console.log("Incomming", e.streams[0]);
           if (remoteVideoRef.current) {
             remoteVideoRef.current.srcObject = e.streams[0];
+          }
+        }
+
+
+        peerConnection.peer.onicecandidate = event => {
+          console.log("event", event);
+          const payload = {
+            event: 'candidate',
+            candidate: event.candidate,
+            Id: JSON.parse(localStorage.getItem("UserId") || "''"),
+            callId: JSON.parse(localStorage.getItem("UserId") || "''"),
+
+          }
+          if (event.candidate) {
+            if (socket.readyState === WebSocket.OPEN) {
+              socket.send(JSON.stringify(payload));
+            }
           }
         }
 

@@ -35,7 +35,7 @@ export const AddVideo = async (req: Request, res: Response) => {
   const { Title, Id, Image } = req.body;
 
   if (!Title || !Id || !req.files) {
-    return res.status(403).json({ msg: "All fields are mandatory" });
+    return res.status(201).json({ msg: "All fields are mandatory" });
   }
 
   const files = req.files as { [fieldname: string]: Express.Multer.File[] };
@@ -48,15 +48,13 @@ export const AddVideo = async (req: Request, res: Response) => {
     }
 
     if (!videoFile) {
-      return res
-        .status(403)
-        .json({ msg: "Both video and image files are required" });
+      return res.status(204).json({ msg: "Both video and image files are required" });
     }
 
     const newVideo = await addVideo(Title, videoFile, imageFile, Id);
     console.log(newVideo);
     redis.publish("new_video", "");
-    return res.json(newVideo);
+    return res.status(201).json(newVideo);
 
     // res.json({ message: 'Files uploaded successfully', videoPath, imagePath });
   } catch (error) {
@@ -67,7 +65,7 @@ export const AddVideo = async (req: Request, res: Response) => {
 
 export const GetVideo = async (req: Request, res: Response) => {
   const { Id } = req.params;
-  if (!Id) return res.json({ msg: "Invalid video Id" });
+  if (!Id) return res.status(401).json({ msg: "Invalid video Id" });
 
   try {
     //@ts-ignore
@@ -120,9 +118,7 @@ export const GetVideo = async (req: Request, res: Response) => {
     }
   } catch (error) {
     console.log("Error serving video:", error);
-    res
-      .status(500)
-      .json({ error: "An error occurred while trying to serve the video" });
+    res.status(500).json({ error: "An error occurred while trying to serve the video" });
   }
 };
 
@@ -151,7 +147,7 @@ export const broadcast = async (req: Request, res: Response) => {
       sdp: peer.localDescription,
     };
 
-    res.json(payload);
+    res.status(201).json(payload);
     return;
   } catch (error) {
     console.log(error);
@@ -167,7 +163,7 @@ export const viewer = async (req: Request, res: Response) => {
     let singleStreamer: liveStreamsInterface | undefined;
 
     if (liveStreams) {
-      singleStreamer = liveStreams.find((stream) => stream.socketId === body.roomId);
+      singleStreamer = liveStreams.find((stream) => stream.socketId === req.body.roomId);
       if (!singleStreamer) {
         peer.close();
         return;
@@ -183,11 +179,7 @@ export const viewer = async (req: Request, res: Response) => {
         ...singleStreamer.MediaStream[0].getTracks(),
         ...singleStreamer.MediaStream[1].getTracks(),
       ]);
-      combinedStream
-        .getTracks()
-        .forEach((track: RTCTrackEvent) =>
-          peer.addTrack(track, combinedStream)
-        );
+      combinedStream.getTracks().forEach((track: RTCTrackEvent) => peer.addTrack(track, combinedStream));
     }
 
     const answer = await peer.createAnswer();
@@ -200,7 +192,7 @@ export const viewer = async (req: Request, res: Response) => {
       Streamername: singleStreamer?.username || "",
     };
 
-    res.json(payload);
+    res.status(201).json(payload);
   } catch (error) {
     console.log(error);
   }
@@ -220,11 +212,11 @@ export const getLiveStreams = async (req: Request, res: Response) => {
 
     const streams = await redis.get("streams");
     if (streams != null) {
-      return res.json({ LiveStreams, videos: JSON.parse(streams) });
+      return res.status(200).json({ LiveStreams, videos: JSON.parse(streams) });
     } else {
       const videos = await Videos();
       await redis.set("streams", JSON.stringify(videos), "EX", 10);
-      return res.json({ LiveStreams, videos });
+      return res.status(200).json({ LiveStreams, videos });
     }
   } catch (error) {
     console.log(error);
@@ -233,10 +225,12 @@ export const getLiveStreams = async (req: Request, res: Response) => {
 
 export const endStream = (req: Request, res: Response) => {
   const { Id } = req.body;
-  if (!Id) return res.json({ msg: "Id is Undefined" });
+  if (!Id) return res.status(204).json({ msg: "Id is Undefined" });
+  let tempId: string;
 
   liveStreams.forEach((stream) => {
     if (stream.Id === Id) {
+      tempId = stream.socketId;
       stream.MediaStream.forEach((mediaStream) => {
         mediaStream.getTracks().forEach((track) => track.stop());
       });
@@ -247,21 +241,34 @@ export const endStream = (req: Request, res: Response) => {
     }
   });
   liveStreams = liveStreams.filter((stream) => stream.Id !== Id);
-  res.json({ msg: "success", liveStreams });
+
+  if (viewers.length > 0) {
+    viewers.forEach((stream) => {
+      if (tempId === Id) {
+        stream.peer.close();
+        //@ts-ignore
+        stream.peer = null;
+        return;
+      }
+    });
+    viewers = viewers.filter((stream) => stream.Id != tempId);
+  }
+
+  res.status(200).json({ msg: "success", liveStreams });
 };
 
 export const stopViewer = (req: Request, res: Response) => {
   const { Id } = req.body;
   console.log("stop viewer Id", Id);
   // console.log("viewers", viewers)
-  if (!Id) return res.json({ err: "Id is undefined" });
+  if (!Id) return res.status(204).json({ err: "Id is undefined" });
+  if (viewers.length == 0) return res.status(200).json({ msg: "No viewers" });
 
   viewers.forEach((stream) => {
     if (stream.Id === Id) {
       stream.peer.close();
       //@ts-ignore
       stream.peer = null;
-      console.log("stream.peer = null");
       return;
     }
   });
@@ -269,46 +276,45 @@ export const stopViewer = (req: Request, res: Response) => {
     return stream.Id != Id;
   });
   console.log("viewers", viewers);
-  res.json({ msg: "success" });
+  res.status(200).json({ msg: "success" });
 };
 
+
 export const createCall = async (req: Request, res: Response) => {
-  const body = req.body;
+  const { Id, callId, sdp } = req.body;
   try {
     //@ts-ignore
     const peer = new webrtc.RTCPeerConnection(Servers);
 
-    const stream = [];
+    const stream: MediaStream[] = [];
     peer.ontrack = (e: RTCTrackEvent) => {
       console.log("Streams from createCall", e.streams[0]);
-      stream.push(e.streams[0])
+      stream.push(e.streams[0]);
     };
 
-    // const combinedStream = new MediaStream([...stream[0].getTracks(), ...stream[1].getTracks()]);
     Groupcall.push({
-      Id: body.Id,
-      callId: body.callId,
+      Id,
+      callId,
       MediaStream: stream,
-      peer: peer
-    })
+      peer
+    });
 
-    const desc = new webrtc.RTCSessionDescription(body.sdp);
+    const desc = new webrtc.RTCSessionDescription(sdp);
     await peer.setRemoteDescription(desc);
     const answer = await peer.createAnswer();
-    await peer.setLocalDescription(answer)
+    await peer.setLocalDescription(answer);
     const payload = {
       sdp: peer.localDescription,
-      Title: singleStreamer?.Title || '',
-      Streamername: singleStreamer?.username || '',
     };
 
-    res.json(payload);
-    return;
+    res.status(201).json(payload);
 
   } catch (error) {
     console.log(error);
+    res.status(500).json({ error: error.message });
   }
 };
+
 
 
 export const joinCall = async (req: Request, res: Response) => {
@@ -339,11 +345,12 @@ export const joinCall = async (req: Request, res: Response) => {
           });
 
           const combinedStream = new MediaStream([
-            ...member.MediaStream[0].getTracks(),
-            ...member.MediaStream[1].getTracks(),
+            // ...member.MediaStream[0].getTracks(),
+            // ...member.MediaStream[1].getTracks(),
+            ...member.MediaStream.flatMap(track => track.getTracks())
           ]);
 
-          console.log("combinedStream 2", combinedStream);
+          console.log("combinedStream", combinedStream.getTracks())
           memberStream.push(combinedStream);
         }
 
@@ -381,7 +388,7 @@ export const joinCall = async (req: Request, res: Response) => {
       sdp: peer.localDescription,
     };
 
-    res.json(payload);
+    res.status(201).json(payload);
   } catch (error) {
     console.log(error);
   }

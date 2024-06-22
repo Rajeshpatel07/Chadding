@@ -1,7 +1,9 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { peerConnection } from "../services/Webrtc";
 import { useParams } from "react-router-dom";
 import axios from "axios";
+
+const socket = new WebSocket("ws://localhost:5000")
 
 const useJoincall = () => {
 
@@ -9,6 +11,7 @@ const useJoincall = () => {
   const localVideoRef = useRef<HTMLVideoElement | null>(null);
   const remoteVideoRef = useRef<HTMLVideoElement | null>(null);
   const params = useParams();
+
 
   const getCamera = async () => {
     try {
@@ -45,12 +48,28 @@ const useJoincall = () => {
             remoteVideoRef.current.srcObject = e.streams[0];
           }
         }
-      }
 
-    } catch (error) {
+        peerConnection.peer.onicecandidate = event => {
+          console.log("event", event);
+          const payload = {
+            event: 'candidate',
+            candidate: event.candidate,
+            Id: JSON.parse(localStorage.getItem("UserId") || "''"),
+            callId: params.callId,
+          }
+          if (event.candidate) {
+            if (socket.readyState === WebSocket.OPEN) {
+              socket.send(JSON.stringify(payload));
+            }
+          }
+        }
+      }
+    }
+    catch (error) {
       console.log(error);
     }
   }
+
 
   const onnegotiationneededEvent = async () => {
     try {
